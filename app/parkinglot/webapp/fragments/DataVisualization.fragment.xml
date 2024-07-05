@@ -1,0 +1,15 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:form="sap.ui.layout.form"
+>  
+<form:SimpleForm
+        id="idVisualDetailsForm"
+        editable="false"
+        layout="ColumnLayout"
+        columnsM="2"
+        columnsL="3"
+        columnsXL="4"
+    >
+ </form:SimpleForm>
+</core:FragmentDefinition>

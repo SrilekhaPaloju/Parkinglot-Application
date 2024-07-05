@@ -1,0 +1,143 @@
+<mvc:View
+    controllerName="com.app.parkinglot.controller.Home"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    xmlns="sap.m"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+>
+    <f:DynamicPage
+        id="idSlotsListPage"
+        headerExpanded="true"
+    >
+        <f:title>
+            <f:DynamicPageTitle id="idSlotsListPageTitle">
+                <f:heading>
+                    <Title
+                        id="idSlotsPageHeadingTitle"
+                        text="{i18n>title}"
+                    />
+                </f:heading>
+                <f:expandedContent>
+                    <Label
+                        id="idSlotsListPageECL"
+                        text="{i18n>SubTitle}"
+                    />
+                </f:expandedContent>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:content>
+            <Table
+                id="idSlotsTable"
+                growing="true"
+                mode="MultiSelect"
+                alternateRowColors="true"
+                items="{/AssignedLots}"
+                selectionChange="onSelectSlot"
+            >
+                <headerToolbar>
+                    <OverflowToolbar id="idSlotsTableHeader">
+                        <Title
+                            id="idTableHeaderTitle"
+                            text="Assigned Slots"
+                        />
+                        <ToolbarSpacer id="idTableHeaderSpacer" />
+                        <Button
+                            id="idBtnUnassign"
+                            type="Default"
+                            press="onUnassignlotPress"
+                            text="Unassign"
+                        />
+                        <Button
+                            id="idBtnEdit"
+                            icon="sap-icon://edit"
+                            type="Emphasized"
+                            press="onEditlotPress"
+                            text="Edit"
+                        />
+                        <Button
+                            id="idBtnCreate"
+                            icon="sap-icon://shipping-status"
+                            type="Accept"
+                            press="onCreatelotPress"
+                            text="ParkingLot Allocation"
+                        />
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column id="idParkingLotNoCol">
+                        <Title
+                            id="idParkingLotNoColTitle"
+                            text="ParkingLot Number"
+                        />
+                    </Column>
+                    <Column id="idDriverCol">
+                        <Title
+                            id="idDriverColTitle"
+                            text="Driver Name"
+                        />
+                    </Column>
+                    <Column id="idPhonenoCol">
+                        <Title
+                            id="idPhonenoColTitle"
+                            text="Phone Number"
+                        />
+                    </Column>
+                    <Column id="idVehiclenoCol">
+                        <Title
+                            id="idVehiclenoCol1Title"
+                            text="Vehicle Number"
+                        />
+                    </Column>
+                    <Column id="idTransporttypeCol">
+                        <Title
+                            id="idTransporttypecolTitle"
+                            text="Transport Type"
+                        />
+                    </Column>
+                    <Column id="idIntimeCol">
+                        <Title
+                            id="idIntimecolTitle"
+                            text="In Time"
+                        />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem
+                        id="idSlotsTableColListItem"
+                        type="Navigation"
+                    >
+                        <cells>
+                            <Text
+                                id="idparkingLotNumberColValue"
+                                text="{parkinglot/parkingLotNumber}"
+                            />
+                            <Text
+                                id="iddriveNameColValue"
+                                text="{driverName}"
+                            />
+                            <Text
+                                id="idphoneNumberColValue"
+                                text="{phoneNumber}"
+                            />
+                            <Text
+                                id="idvehicleNumberColValue"
+                                text="{vehicleNumber}"
+                            />
+                            <Text
+                                id="idtrasnporTtypeColValue"
+                                text="{trasnporTtype}"
+                            />
+                            <Text
+                                id="idinTimeColValue"
+                                text="{inTime}"
+                            />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            
+            </Table>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

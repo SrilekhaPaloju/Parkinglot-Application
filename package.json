@@ -1,0 +1,29 @@
+{
+  "name": "Parking-Application",
+  "version": "1.0.0",
+  "description": "A simple CAP project.",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@sap/cds": "^7.9.3",
+    "@sap/cds-odata-v2-adapter-proxy": "^1.9.21",
+    "express": "^4"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^1",
+    "@sap/eslint-plugin-cds": "^3",
+    "@sap/ux-specification": "^1.120.13",
+    "eslint": "^9"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "watch-parkinglotfiori": "cds watch --open parkinglotfiori/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-parkinglot": "cds watch --open parkinglot/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-pakinglotfiorielemnt": "cds watch --open pakinglotfiorielemnt/webapp/index.html?sap-ui-xx-viewCache=false"
+  },
+  "sapux": [
+    "app/parkinglotfiori",
+    "app/pakinglotfiorielemnt"
+  ]
+}
