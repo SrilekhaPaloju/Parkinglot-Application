@@ -31,7 +31,7 @@
             <Table
                 id="idSlotsTable"
                 growing="true"
-                mode="MultiSelect"
+                mode="SingleSelectMaster"
                 alternateRowColors="true"
                 items="{/AssignedLots}"
                 selectionChange="onSelectSlot"
@@ -43,19 +43,6 @@
                             text="Assigned Slots"
                         />
                         <ToolbarSpacer id="idTableHeaderSpacer" />
-                        <Button
-                            id="idBtnUnassign"
-                            type="Default"
-                            press="onUnassignlotPress"
-                            text="Unassign"
-                        />
-                        <Button
-                            id="idBtnEdit"
-                            icon="sap-icon://edit"
-                            type="Emphasized"
-                            press="onEditlotPress"
-                            text="Edit"
-                        />
                         <Button
                             id="idBtnCreate"
                             icon="sap-icon://shipping-status"
@@ -102,6 +89,12 @@
                             text="In Time"
                         />
                     </Column>
+                  <Column id="idOuttimeCol">
+                        <Title
+                            id="idOuttimecolTitle"
+                            text="Out Time"
+                        />
+                    </Column>
                 </columns>
                 <items>
                     <ColumnListItem
@@ -132,6 +125,10 @@
                             <Text
                                 id="idinTimeColValue"
                                 text="{inTime}"
+                            />
+                            <Text
+                                id="idOuttimeColValue"
+                                text="{outTime}"
                             />
                         </cells>
                     </ColumnListItem>

@@ -2,79 +2,107 @@
     xmlns:core="sap.ui.core"
     xmlns="sap.m"
     xmlns:form="sap.ui.layout.form"
->  
+>
+    <VBox id="_IDGenVBoxlot">
+        <Toolbar
+            id="_IDGenToolbar1"
+            design="Transparent"
+            class="sapUiTinyMarginTop sapUiTinyMarginBottom"
+        >
+            <ToolbarSpacer id="_IDGenToolbarSpacer1" />
+            <Button
+                id="idBtnSave"
+                icon="sap-icon://save"
+                type="Accept"
+                text="Save"
+                press="onSavePress"
+                visible="{viewModel>/isEditable}"
+            />
+            <Button
+                id="idBtnUnassign"
+                type="Default"
+                press="onUnassignlotPress"
+                text="Unassign"
+            />
+        </Toolbar>
 
-<form:SimpleForm
-        id="idParkingDetailsForm"
-        editable="false"
-        layout="ColumnLayout"
-        columnsM="2"
-        columnsL="3"
-        columnsXL="4"
-    >
-        <Label
-            id="idParkingLotNumberLabel"
-            text="ParkingLot Number"
-        />
-        <Text
-            id="idparkingLotNumberText"
-            text="{parkingLotNumber}"
-        />
-        <Label
-            id="idVehicleNumberLabel"
-            text="VehicleNumber"
-        />
-        <Text
-            id="idVehicleNumberText"
-            text="{Assignedslots/vehicleNumber}"
-        />
-        <Label
-            id="idDriverNameLabel"
-            text="DriverName"
-        />
-        <Text
-            id="idDriverNameText"
-            text="{Assignedslots/driverName}"
-        />
-        <Label
-            id="idphoneNumberLabel"
-            text="phoneNumber"
-        />
-        <Text
-            id="idphoneNumberText"
-            text="{Assignedslots/phoneNumber}"
-        />
-        <Label
-            id="idtrasnporTtypeLabel"
-            text="trasnporTtype"
-        />
-        <Text
-            id="idtrasnporTtypeText"
-            text="{trasnporTtype}"
-        />
-         <Label
-            id="idinTimeLabel"
-            text="inTime"
-        />
-        <Text
-            id="idinTimeText"
-            text="{Assignedslots/inTime}"
-        />
-          <Label
-            id="idoutTimeLabel"
-            text="outTime"
-        />
-        <Text
-            id="idoutTimeText"
-            text="{Assignedslots/outTime}"
-        />
-          <Label
-            id="idstatusLabel"
-            text="status"
-        />
-        <Text
-            id="idstatusText"
-            text="{status}"
-        />
-    </form:SimpleForm>
+        <form:SimpleForm
+            id="idParkingDetailsForm"
+            editable="{viewModel>/isEditable}"
+            layout="ColumnLayout"
+            columnsM="2"
+            columnsL="3"
+            columnsXL="4"
+        >
+             <Label
+                id="idParkingLotNumberLabel"
+                text="ParkingLot Number"
+            />
+            <ComboBox
+                id="parkingLotSelectComboBox"
+                selectedKey="{parkinglot_parkingLotNumber}"
+                editable="{viewModel>/isEditable}"
+                items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'NE', value1: 'Occupied'}]}"
+            >
+                <core:Item id="IDParkinglotnumgen" key="{parkingLotNumber}"
+                        text="{parkingLotNumber}" />
+            </ComboBox>
+            <Label
+                id="idVehicleNumberLabel"
+                text="Vehicle Number"
+            />
+            <Text
+                id="idVehicleNumberInput"
+                text="{vehicleNumber}"
+            />
+            <Label
+                id="idDriverNameLabel"
+                text="Driver Name"
+            />
+            <Text
+                id="idDriverNameInput"
+                text="{driverName}"
+            />
+            <Label
+                id="idphoneNumberLabel"
+                text="Phone Number"
+            />
+            <Text
+                id="idphoneNumberInput"
+                text="{phoneNumber}"
+            />
+            <Label
+                id="idtrasnporTtypeLabel"
+                text="Transport Type"
+            />
+            <Text
+                id="idtrasnporTtypeInput"
+                text="{trasnporTtype}"
+            />
+            <Label
+                id="idinTimeLabel"
+                text="In Time"
+            />
+            <Text
+                id="idinTimeText"
+                text="{inTime}"
+            />
+            <Label
+                id="idoutTimeLabel"
+                text="Out Time"
+            />
+            <Text
+                id="idoutTimeText"
+                text=" "
+            />
+            <Label
+                id="idstatusLabel"
+                text="Status"
+            />
+            <Text
+                id="idstatusText"
+                text="{parkinglot/status}"
+            />
+        </form:SimpleForm>
+    </VBox>
 </core:FragmentDefinition>

@@ -22,10 +22,10 @@
                 <expandedHeading>
                     <m:Title
                         id="idUserInformation"
-                        text="{parkingLotNumber}"
+                        text="{parkinglot/parkingLotNumber}"
                         wrapping="true"
                     />
-                </expandedHeading>
+                        </expandedHeading>
             </ObjectPageDynamicHeaderTitle>
         </headerTitle>
 

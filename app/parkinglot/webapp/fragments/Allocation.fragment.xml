@@ -10,22 +10,6 @@
         contentWidth="30%"
         title="Slot Allocation"
     >
-        <beginButton>
-            <Button
-                id="_IDAssignButton"
-                text="Assign"
-                press="onAssignPress"
-                type="Accept"
-            />
-        </beginButton>
-        <endButton>
-            <Button
-                id="idCancelslot"
-                text="Cancel"
-                press="onCloseCreateDialog"
-                type="Negative"
-            />
-        </endButton>
         <content>
             <form:SimpleForm
                 id="SimpleFormToolbar"
@@ -62,9 +46,9 @@
                         text="{parkingLotNumber}"
                     />
                 </Select>
-			<!-- <ComboBox id="_IDGenComboBox1"
+                <!-- <ComboBox id="_IDGenComboBox1"
             selectedKey="{parkingModel>/parkingLotNumber}"
-				 items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'EQ', value1: 'Available'}]}">
+				 items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'NE', value1: 'Occupied'}]}">
 				<core:Item
                         id="_IDGenItem3"
                         key="{parkingLotNumber}"
@@ -133,5 +117,27 @@
 			</ComboBox> -->
             </form:SimpleForm>
         </content>
+         <Toolbar>
+            <Button
+                id="_IDAssignButton"
+                text="Assign"
+                press="onAssignPress"
+                type="Accept"
+            />
+            <ToolbarSpacer />
+            <Button
+                id="idBtnUnassign"
+                type="Default"
+                press="onUnassignlotPress"
+                text="Unassign"
+            />
+            <ToolbarSpacer />
+            <Button
+                id="idCancelslot"
+                text="Cancel"
+                press="onCloseCreateDialog"
+                type="Negative"
+            />
+        </Toolbar>
     </Dialog>
 </core:FragmentDefinition>
