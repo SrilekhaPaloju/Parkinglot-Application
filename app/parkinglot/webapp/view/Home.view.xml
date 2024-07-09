@@ -50,6 +50,12 @@
                             press="onCreatelotPress"
                             text="ParkingLot Allocation"
                         />
+                        <Button
+                            id="idBtnUnassign"
+                            type="Default"
+                            press="onUnassignlotPress"
+                            text="Unassign"
+                        />
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>
@@ -89,10 +95,10 @@
                             text="In Time"
                         />
                     </Column>
-                  <Column id="idOuttimeCol">
+                      <Column id="idstatusCol" visible="false">
                         <Title
-                            id="idOuttimecolTitle"
-                            text="Out Time"
+                            id="idstatuscolTitle"
+                            text="status"
                         />
                     </Column>
                 </columns>
@@ -126,14 +132,13 @@
                                 id="idinTimeColValue"
                                 text="{inTime}"
                             />
-                            <Text
-                                id="idOuttimeColValue"
-                                text="{outTime}"
+                             <Text
+                                id="idstatusColValue"
+                                text="{parkinglot/status}"
                             />
                         </cells>
                     </ColumnListItem>
                 </items>
-            
             </Table>
         </f:content>
     </f:DynamicPage>

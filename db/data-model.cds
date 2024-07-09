@@ -20,6 +20,18 @@ entity AssignedLots : cuid {
   parkinglot    : Association to ParkingLot;
 }
 
+entity History : cuid {
+  driverName        : String;
+  driverMobile      : String;
+  vehicleNumber     : String;
+  deliveryType      : String;
+  checkInTime       : DateTime;
+  checkOutTime      : DateTime;
+  historySlotNumber : Association to ParkingLot;
+  
+
+}
+
 
 
 

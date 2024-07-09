@@ -18,12 +18,6 @@
                 press="onSavePress"
                 visible="{viewModel>/isEditable}"
             />
-            <Button
-                id="idBtnUnassign"
-                type="Default"
-                press="onUnassignlotPress"
-                text="Unassign"
-            />
         </Toolbar>
 
         <form:SimpleForm

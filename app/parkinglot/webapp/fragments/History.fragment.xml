@@ -1,0 +1,93 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:form="sap.ui.layout.form"
+>
+    <Table
+        id="idSlotsTable"
+        growing="true"
+        mode="SingleSelectMaster"
+        alternateRowColors="false"
+        items="{/History}"
+        selectionChange="onSelectSlot"
+    >
+        <columns>
+            <Column id="idParkingLotNoCol">
+                <Title
+                    id="idParkingLotNoColTitle"
+                    text="ParkingLot Number"
+                />
+            </Column>
+            <Column id="idDriverCol">
+                <Title
+                    id="idDriverColTitle"
+                    text="Driver Name"
+                />
+            </Column>
+            <Column id="idPhonenoCol">
+                <Title
+                    id="idPhonenoColTitle"
+                    text="Phone Number"
+                />
+            </Column>
+            <Column id="idVehiclenoCol">
+                <Title
+                    id="idVehiclenoCol1Title"
+                    text="Vehicle Number"
+                />
+            </Column>
+            <Column id="idTransporttypeCol">
+                <Title
+                    id="idTransporttypecolTitle"
+                    text="Transport Type"
+                />
+            </Column>
+            <Column id="idIntimeCol">
+                <Title
+                    id="idIntimecolTitle"
+                    text="In Time"
+                />
+            </Column>
+            <Column id="idOuttimeCol">
+                <Title
+                    id="idOuttimecolTitle"
+                    text="Out Time"
+                />
+            </Column>
+        </columns>
+        <items>
+            <ColumnListItem id="idSlotsTableColListItem">
+                <cells>
+                    <Text
+                        id="idparkingLotNumberColValue"
+                        text="{historySlotNumber_parkingLotNumber}"
+                    />
+                    <Text
+                        id="iddriveNameColValue"
+                        text="{driverName}"
+                    />
+                    <Text
+                        id="idphoneNumberColValue"
+                        text="{driverMobile}"
+                    />
+                    <Text
+                        id="idvehicleNumberColValue"
+                        text="{vehicleNumber}"
+                    />
+                    <Text
+                        id="idtrasnporTtypeColValue"
+                        text="{deliveryType}"
+                    />
+                    <Text
+                        id="idinTimeColValue"
+                        text="{checkInTime}"
+                    />
+                    <Text
+                        id="idOuttimeColValue"
+                        text="{checkOutTime}"
+                    />
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
+</core:FragmentDefinition>

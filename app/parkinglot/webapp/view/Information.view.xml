@@ -19,13 +19,13 @@
         <!-- User Information Section -->
         <headerTitle>
             <ObjectPageDynamicHeaderTitle id="idObjectPageDynamicHeaderTitle">
-                <expandedHeading>
+                <!-- <expandedHeading>
                     <m:Title
                         id="idUserInformation"
                         text="{parkinglot/parkingLotNumber}"
                         wrapping="true"
                     />
-                        </expandedHeading>
+                        </expandedHeading> -->
             </ObjectPageDynamicHeaderTitle>
         </headerTitle>
 
@@ -41,6 +41,21 @@
                             <core:Fragment
                                 type="XML"
                                 fragmentName="com.app.parkinglot.fragments.LotInformation"
+                            />
+                        </blocks>
+                    </ObjectPageSubSection>
+                </subSections>
+            </ObjectPageSection>
+             <ObjectPageSection
+                id="idHistory"
+                title="History"
+            >
+                <subSections>
+                    <ObjectPageSubSection id="idHistorySubSection">
+                        <blocks>
+                            <core:Fragment
+                                type="XML"
+                                fragmentName="com.app.parkinglot.fragments.History"
                             />
                         </blocks>
                     </ObjectPageSubSection>
@@ -63,6 +78,7 @@
                     </ObjectPageSubSection>
                 </subSections>
             </ObjectPageSection>
+        
         </sections>
     </ObjectPageLayout>
 </mvc:View>
