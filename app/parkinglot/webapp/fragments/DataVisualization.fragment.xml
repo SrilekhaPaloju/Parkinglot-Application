@@ -2,14 +2,65 @@
     xmlns:core="sap.ui.core"
     xmlns="sap.m"
     xmlns:form="sap.ui.layout.form"
->  
-<form:SimpleForm
-        id="idVisualDetailsForm"
-        editable="false"
-        layout="ColumnLayout"
-        columnsM="2"
-        columnsL="3"
-        columnsXL="4"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:layout="sap.ui.layout"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:viz.data="sap.viz.ui5.data"
+    height="100%"
+>
+    <!-- <layout:FixFlex
+        id='chartFixFlex'
+        minFlexSize="250"
     >
- </form:SimpleForm>
+        <layout:flexContent>
+            <viz:VizFrame
+                id="idVizFrame"
+                uiConfig="{applicationSet:'fiori'}"
+                height='100%'
+                width="100%"
+                vizType='donut'
+            >
+                <viz:dataset>
+                    <viz.data:FlattenedDataset
+                        id="_IDGenFlattenedDataset1"
+                        data="{/milk}"
+                    >
+                        <viz.data:dimensions>
+                            <viz.data:DimensionDefinition
+                                id="_IDGenDimensionDefinition1"
+                                name="Store Name"
+                                value="{Store Name}"
+                            />
+                        </viz.data:dimensions>
+                        <viz.data:measures>
+                            <viz.data:MeasureDefinition
+                                id="_IDGenMeasureDefinition1"
+                                name="Revenue"
+                                value="{Revenue}"
+                            />
+                        </viz.data:measures>
+                    </viz.data:FlattenedDataset>
+                </viz:dataset>
+
+                <viz:feeds>
+                    <viz.feeds:FeedItem
+                        id="_IDGenFeedItem1"
+                        uid="size"
+                        type="Measure"
+                        values="Revenue"
+                    />
+                    <viz.feeds:FeedItem
+                        id="_IDGenFeedItem2"
+                        uid="color"
+                        type="Dimension"
+                        values="Store Name"
+                    />
+                </viz:feeds>
+                <viz:dependents>
+                    <viz:Popover id="idPopOver" />
+                </viz:dependents>
+            </viz:VizFrame>
+        </layout:flexContent>
+    </layout:FixFlex> -->
 </core:FragmentDefinition>

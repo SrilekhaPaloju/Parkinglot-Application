@@ -19,13 +19,13 @@
         <!-- User Information Section -->
         <headerTitle>
             <ObjectPageDynamicHeaderTitle id="idObjectPageDynamicHeaderTitle">
-                <!-- <expandedHeading>
+                <expandedHeading>
                     <m:Title
                         id="idUserInformation"
                         text="{parkinglot/parkingLotNumber}"
                         wrapping="true"
                     />
-                        </expandedHeading> -->
+                        </expandedHeading>
             </ObjectPageDynamicHeaderTitle>
         </headerTitle>
 
@@ -46,7 +46,7 @@
                     </ObjectPageSubSection>
                 </subSections>
             </ObjectPageSection>
-             <ObjectPageSection
+             <!-- <ObjectPageSection
                 id="idHistory"
                 title="History"
             >
@@ -60,7 +60,7 @@
                         </blocks>
                     </ObjectPageSubSection>
                 </subSections>
-            </ObjectPageSection>
+            </ObjectPageSection> -->
 
             <!-- Total Books Section -->
             <ObjectPageSection

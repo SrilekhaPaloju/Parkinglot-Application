@@ -35,6 +35,8 @@
                 alternateRowColors="true"
                 items="{/AssignedLots}"
                 selectionChange="onSelectSlot"
+                growingThreshold="10"
+               
             >
                 <headerToolbar>
                     <OverflowToolbar id="idSlotsTableHeader">
@@ -43,6 +45,26 @@
                             text="Assigned Slots"
                         />
                         <ToolbarSpacer id="idTableHeaderSpacer" />
+                        <Button
+                            id="editButton"
+                            text="Edit"
+                            type="Transparent"
+                            press="onEdit"
+                        />
+                        <Button
+                            id="saveButton"
+                            text="Save"
+                            type="Transparent"
+                            press="onSave"
+                            visible="false"
+                        />
+                        <Button
+                            id="cancelButton"
+                            text="Cancel"
+                            type="Transparent"
+                            press="onCancel"
+                            visible="false"
+                        />
                         <Button
                             id="idBtnCreate"
                             icon="sap-icon://shipping-status"
@@ -56,47 +78,85 @@
                             press="onUnassignlotPress"
                             text="Unassign"
                         />
+                        <Button
+                            id="idBtnHistory"
+                            type="Default"
+                            press="onHistorylotPress"
+                            text="History"
+                        />
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>
-                    <Column id="idParkingLotNoCol">
-                        <Title
+                    <Column
+                        id="idParkingLotNoCol"
+                        width="12em"
+                        hAlign="Center"
+                    >
+                        <Text
                             id="idParkingLotNoColTitle"
                             text="ParkingLot Number"
                         />
                     </Column>
-                    <Column id="idDriverCol">
-                        <Title
+                    <Column
+                        id="idDriverCol"
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                        hAlign="Center"
+                    >
+                        <Text
                             id="idDriverColTitle"
                             text="Driver Name"
                         />
                     </Column>
-                    <Column id="idPhonenoCol">
-                        <Title
+                    <Column
+                        id="idPhonenoCol"
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                        hAlign="Center"
+                    >
+                        <Text
                             id="idPhonenoColTitle"
                             text="Phone Number"
                         />
                     </Column>
-                    <Column id="idVehiclenoCol">
-                        <Title
+                    <Column
+                        id="idVehiclenoCol"
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                        hAlign="Center"
+                    >
+                        <Text
                             id="idVehiclenoCol1Title"
                             text="Vehicle Number"
                         />
                     </Column>
-                    <Column id="idTransporttypeCol">
-                        <Title
+                    <Column
+                        id="idTransporttypeCol"
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                        hAlign="Center"
+                    >
+                        <Text
                             id="idTransporttypecolTitle"
                             text="Transport Type"
                         />
                     </Column>
-                    <Column id="idIntimeCol">
-                        <Title
+                    <Column
+                        id="idIntimeCol"
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                        hAlign="Center"
+                    >
+                        <Text
                             id="idIntimecolTitle"
                             text="In Time"
                         />
                     </Column>
-                      <Column id="idstatusCol" visible="false">
-                        <Title
+                    <Column
+                        id="idstatusCol"
+                        visible="false"
+                    >
+                        <Text
                             id="idstatuscolTitle"
                             text="status"
                         />
@@ -106,36 +166,88 @@
                     <ColumnListItem
                         id="idSlotsTableColListItem"
                         type="Navigation"
+                        vAlign="Middle"
                     >
                         <cells>
-                            <Text
-                                id="idparkingLotNumberColValue"
-                                text="{parkinglot/parkingLotNumber}"
-                            />
-                            <Text
-                                id="iddriveNameColValue"
-                                text="{driverName}"
-                            />
-                            <Text
-                                id="idphoneNumberColValue"
-                                text="{phoneNumber}"
-                            />
-                            <Text
-                                id="idvehicleNumberColValue"
-                                text="{vehicleNumber}"
-                            />
-                            <Text
-                                id="idtrasnporTtypeColValue"
-                                text="{trasnporTtype}"
-                            />
-                            <Text
-                                id="idinTimeColValue"
-                                text="{inTime}"
-                            />
-                             <Text
-                                id="idstatusColValue"
-                                text="{parkinglot/status}"
-                            />
+                            <VBox>
+                                <Text
+                                    id="idparkingLotNumberColValue"
+                                    text="{parkinglot/parkingLotNumber}"
+                                />
+                                <Select
+                                    id="editparkingLotSelect"
+                                    selectedKey=""
+                                    items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'EQ', value1: 'Available'}],  templateShareable: true}"
+                                    visible="false"
+                                >
+                                    <core:Item
+                                        id="IDcoreitem"
+                                        key="{parkingLotNumber}"
+                                        text="{parkingLotNumber}"
+                                    />
+                                </Select>
+                            </VBox>
+                            <VBox>
+                                <Text
+                                    id="iddriveNameColValue"
+                                    text="{driverName}"
+                                />
+                                <Input
+                                    value="{driverName}"
+                                    visible="false"
+                                    
+                                />
+                            </VBox>
+                            <VBox>
+                                <Text
+                                    id="idphoneNumberColValue"
+                                    text="{phoneNumber}"
+                                />
+                                <Input
+                                    value="{phoneNumber}"
+                                    visible="false"
+                                />
+                            </VBox>
+                            <VBox>
+                                <Text
+                                    id="idvehicleNumberColValue"
+                                    text="{vehicleNumber}"
+                                />
+                                <Input
+                                    value="{vehicleNumber}"
+                                    visible="false"
+                                />
+                            </VBox>
+                            <VBox>
+                                <Text
+                                    id="idtrasnporTtypeColValue"
+                                    text="{trasnporTtype}"
+                                />
+                                <Input
+                                    value="{trasnporTtype}"
+                                    visible="false"
+                                />
+                            </VBox>
+                            <VBox>
+                                <Text
+                                    id="idinTimeColValue"
+                                    text="{inTime}"
+                                />
+                                <Input
+                                    value="{inTime}"
+                                    visible="false"
+                                />
+                            </VBox>
+                            <VBox>
+                                <Text
+                                    id="idstatusColValue"
+                                    text="{parkinglot/status}"
+                                />
+                                <Input
+                                    value="{parkinglot/status}"
+                                    visible="false"
+                                />
+                            </VBox>
                         </cells>
                     </ColumnListItem>
                 </items>

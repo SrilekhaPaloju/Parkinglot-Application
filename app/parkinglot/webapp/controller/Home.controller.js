@@ -1,7 +1,7 @@
 sap.ui.define([
   "./BaseController",
   "sap/m/MessageToast",
-  "sap/ui/model/json/JSONModel"
+  "sap/ui/model/json/JSONModel",
 ], function (Controller, MessageToast, JSONModel) {
   "use strict";
 
@@ -22,18 +22,19 @@ sap.ui.define([
         this.oAssignedslotDialog.close()
       }
     },
-    // onEditlotPress: async function () {
-    //   if (!this.oEditlotDialog) {
-    //     this.oEditlotDialog = await this.loadFragment("Edit")
-    //   }
-    //   this.oEditlotDialog.open();
 
-    // },
-    // onCloseeditDialog: function () {
-    //   if (this.oEditlotDialog.isOpen()) {
-    //     this.oEditlotDialog.close()
-    //   }
-    // },
+    onHistorylotPress: async function () {
+      if (!this.oHistoryDialog) {
+        this.oHistoryDialog = await this.loadFragment("History")
+      }
+      this.oHistoryDialog.open();
+
+    },
+    onCloseHistoryDialog: function () {
+      if (this.oHistoryDialog.isOpen()) {
+        this.oHistoryDialog.close()
+      }
+    },
     onRowDoubleClick: function () {
       var oSelected = this.byId("idSlotsTable").getSelectedItem();
       var ID = oSelected.getBindingContext().getObject().ID;
@@ -43,6 +44,7 @@ sap.ui.define([
 
       })
     },
+
     onAssignPress: async function () {
       const oUserView = this.getView()
       var sParkingLotNumber = this.byId("parkingLotSelect").getSelectedKey();
@@ -111,9 +113,10 @@ sap.ui.define([
         const oPayload = this.getView().getModel("parkingModel").getProperty("/");
         const oModel = this.getView().getModel("ModelV2");
         this.createData(oModel, oPayload, "/AssignedLots")
+        this.getView().byId("idSlotsTable").getBinding("items").refresh();
         this.oAssignedslotDialog.close();
         MessageToast.show("ParkingLot Assigned Successfully")
-        this.getView().byId("idSlotsTable").getBinding("items").refresh();
+
 
         const updatedParkingLot = {
           status: "Occupied" // Assuming false represents empty parking
@@ -167,50 +170,24 @@ sap.ui.define([
         oView.setModel(oParkingslot, "oParkingslot");
         try {
           const oPayload = this.getView().getModel("oNewHistory").getProperty("/");
-         // const oData = this.getView().getModel("oParkingslot").getProperty("/");
+          // const oData = this.getView().getModel("oParkingslot").getProperty("/");
           const oModel = this.getView().getModel("ModelV2");
           this.createData(oModel, oPayload, "/History")
-          this.deleteData(oModel, "/ParkingLot", sSlotNumber)
-
-          // oSelected.getBindingContext().delete("$auto").then(function () {
-          //   oThis.getView().byId("idSlotsTable").getBinding("items").refresh();
-          // })
-          // Update ParkingLot to mark slot as available
-          //   oModel.remove("/AssignedLots('" + sSlotNumber + "')", {
-          //     success: function () {
-          //       // Update ParkignVeh to mark vehicle as unassigned
-          //       oModel.create("/History", oNewHistory.getData(), {
-          //         success: function () {
-          //           oTable.getBinding("items").refresh(); // Refresh table binding
-          //           sap.m.MessageToast.show("Unassigned the parkingslot");
-
-          //           oModel.refresh(true); // Refresh the model after updates
-          //         }.bind(this),
-          //         error: function (oError) {
-          //           sap.m.MessageBox.error("Error updating ParkignVeh: " + oError.message);
-          //           console.error("Error updating ParkignVeh:", oError);
-          //         }
-          //       });
-          //     }.bind(this),
-          //     error: function (oError) {
-          //       sap.m.MessageBox.error("Error updating ParkingLot: " + oError.message);
-          //       console.error("Error updating ParkingLot:", oError);
-          //     }
-          //   });
-          // Update parking lot entity to mark it as empty
+          oSelected.getBindingContext().delete("$auto").then(function () {
+            MessageToast.show("Unassigned sucessfully")
+            oThis.getView().byId("idSlotsTable").getBinding("items").refresh();
+            this.getView().byId("idHistorySlotsTable").getBinding("items").refresh();
+          })
           const updatedParkingLot = {
-            status: "available" // Assuming false represents empty parking
+            status: "Available" // Assuming false represents empty parking
             // Add other properties if needed
           };
-
           oModel.update("/ParkingLot('" + sSlotNumber + "')", updatedParkingLot, {
-
             success: function () {
-              MessageToast.success(`Parking lot ${parkingLotNumber} is empty.`);
-            },
+            }.bind(this),
             error: function (oError) {
-              MessageToast.show("Failed to update parking lot: " + oError.message);
-            }
+              sap.m.MessageBox.error("Failed to update: " + oError.message);
+            }.bind(this)
           });
 
         } catch (error) {
@@ -218,7 +195,135 @@ sap.ui.define([
           sap.m.MessageToast.show("Failed to unassign vehicle: " + error.message);
         }
       }
-    }
+    },
+    onEdit: function () {
+      var oTable = this.byId("idSlotsTable");
+      var aSelectedItems = oTable.getSelectedItems();
+
+      if (aSelectedItems.length === 0) {
+        sap.m.MessageToast.show("Please select an item to edit.");
+        return;
+      }
+
+      aSelectedItems.forEach(function (oItem) {
+        var aCells = oItem.getCells();
+        aCells.forEach(function (oCell) {
+          var aVBoxItems = oCell.getItems();
+          aVBoxItems[0].setVisible(false); // Hide Text
+          aVBoxItems[1].setVisible(true); // Show Input
+        });
+      });
+      this.byId("editButton").setVisible(false);
+      this.byId("saveButton").setVisible(true);
+      this.byId("cancelButton").setVisible(true);
+    },
+
+    onSave: function () {
+      debugger;
+      const oView = this.getView()
+      var oTable = this.byId("idSlotsTable");
+      var aSelectedItems = oTable.getSelectedItems();
+      var oSelected = this.byId("idSlotsTable").getSelectedItem();
+
+      if (oSelected) {
+        var oContext = oSelected.getBindingContext().getObject();
+        var sVehicle = oContext.vehicleNumber;
+        var sDriverName = oContext.driverName;
+        var sTypeofDelivery = oContext.trasnporTtype;
+        var sDriverMobile = oContext.phoneNumber;
+        var dCheckInTime = oContext.inTime;
+        var dID = oContext.ID;
+        var sOldSlotNumber = oContext.parkinglot.parkingLotNumber;
+
+        // To get the selected parking lot number from the Select element
+        var oSelect = oSelected.getCells()[0].getItems()[1]; // Assuming the Select is the second item in the first cell
+        var sSlotNumber = oSelect.getSelectedKey();
+
+
+        // create a record in history
+        const oNewUpdate = new sap.ui.model.json.JSONModel({
+          driverName: sDriverName,
+          phoneNumber: sDriverMobile,
+          vehicleNumber: sVehicle,
+          trasnporTtype: sTypeofDelivery,
+          inTime: new Date(),
+          ID: dID,
+          parkinglot: {
+            parkingLotNumber: sSlotNumber
+          }
+        })
+        this.getView().setModel(oNewUpdate, "oNewUpdate");
+
+        var oPayload = this.getView().getModel("oNewUpdate").getData();
+        var oDataModel = this.getOwnerComponent().getModel("ModelV2");// Assuming this is your OData V2 model
+
+        try {
+          // Assuming your update method is provided by your OData V2 model
+          oDataModel.update("/AssignedLots(" + oPayload.ID + ")", oPayload, {
+            success: function () {
+              this.getView().byId("idSlotsTable").getBinding("items").refresh();
+              sap.m.MessageBox.success("Slot updated successfully");
+            }.bind(this),
+            error: function (oError) {
+              sap.m.MessageBox.error("Failed to update slot: " + oError.message);
+            }.bind(this)
+          });
+        } catch (error) {
+          sap.m.MessageBox.error("Some technical Issue");
+        }
+      }
+      const updatedParkingLot = {
+        status: "Occupied" // Assuming false represents empty parking
+        // Add other properties if needed
+      };
+      oDataModel.update("/ParkingLot('" + sSlotNumber + "')", updatedParkingLot, {
+        success: function () {
+        }.bind(this),
+        error: function (oError) {
+          sap.m.MessageBox.error("Failed to update: " + oError.message);
+        }.bind(this)
+      });
+      const updatedParkingLotNumber = {
+        status: "Available" // Assuming false represents empty parking
+        // Add other properties if needed
+      };
+      oDataModel.update("/ParkingLot('" + sOldSlotNumber + "')", updatedParkingLotNumber, {
+        success: function () {
+        }.bind(this),
+        error: function (oError) {
+          sap.m.MessageBox.error("Failed to update: " + oError.message);
+        }.bind(this)
+      });
+
+      aSelectedItems.forEach(function (oItem) {
+        var aCells = oItem.getCells();
+        aCells.forEach(function (oCell) {
+          var aVBoxItems = oCell.getItems();
+          aVBoxItems[0].setVisible(true); // Hide Text
+          aVBoxItems[1].setVisible(false); // Show Input
+        });
+      });
+      this.byId("editButton").setVisible(true);
+      this.byId("saveButton").setVisible(false);
+      this.byId("cancelButton").setVisible(false);
+    },
+    onCancel: function () {
+      var oTable = this.byId("idSlotsTable");
+      var aSelectedItems = oTable.getSelectedItems();
+
+      aSelectedItems.forEach(function (oItem) {
+        var aCells = oItem.getCells();
+        aCells.forEach(function (oCell) {
+          var aVBoxItems = oCell.getItems();
+          aVBoxItems[0].setVisible(true); // Show Text
+          aVBoxItems[1].setVisible(false); // Hide Input
+        });
+      });
+
+      this.byId("editButton").setVisible(true);
+      this.byId("saveButton").setVisible(false);
+      this.byId("cancelButton").setVisible(false);
+    },
   });
 });
 
