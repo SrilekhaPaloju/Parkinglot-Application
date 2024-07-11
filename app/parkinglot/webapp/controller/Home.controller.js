@@ -44,6 +44,10 @@ sap.ui.define([
 
       })
     },
+    onDatavisualization: function (){
+      const oRouter = this.getRouter();
+      oRouter.navTo("RouteData")
+    },
 
     onAssignPress: async function () {
       const oUserView = this.getView()
@@ -107,17 +111,25 @@ sap.ui.define([
         return; // Prevent further execution
 
       }
+      const oModel = this.getView().getModel("ModelV2");
+    const oParkingLotData = await oModel.read("/ParkingLot('" + sParkingLotNumber + "')");
+
+    if (oParkingLotData.status === "Occupied") {
+        MessageBox.error("The selected parking lot is already occupied. Please select a different parking lot.");
+        return; // Prevent further execution
+    }
+
       else {
         this.getView().setModel(parkingModel, "parkingModel");
         // this.getView().byId("idSlotsTable").getBinding("items");
         const oPayload = this.getView().getModel("parkingModel").getProperty("/");
         const oModel = this.getView().getModel("ModelV2");
         this.createData(oModel, oPayload, "/AssignedLots")
-        this.getView().byId("idSlotsTable").getBinding("items").refresh();
         this.oAssignedslotDialog.close();
         MessageToast.show("ParkingLot Assigned Successfully")
+        this.getView().byId("idSlotsTable").getBinding("items").refresh();
 
-
+      
         const updatedParkingLot = {
           status: "Occupied" // Assuming false represents empty parking
           // Add other properties if needed
@@ -130,6 +142,10 @@ sap.ui.define([
             sap.m.MessageBox.error("Failed to update: " + oError.message);
           }.bind(this)
         });
+
+        // oUserView.byId("_IDLoginGenInput").setValue("iddriverInputcol");
+        // oUserView.byId("_IDGenLoginInput1").setValue("idphonenumberInputcol");
+        // oUserView.byId("_IDGenLoginInput1").setValue("idvehicleInputcolvalue");
 
       }
     },

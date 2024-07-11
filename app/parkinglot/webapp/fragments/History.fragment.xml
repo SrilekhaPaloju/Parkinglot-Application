@@ -10,6 +10,7 @@
         contentWidth="85%"
         contentHeight="85%"
         
+        
     >
      <customHeader>
             <Bar id="_IDGenBar1">
@@ -34,7 +35,6 @@
                 mode="SingleSelectMaster"
                 alternateRowColors="false"
                 items="{/History}"
-                selectionChange="onSelectSlot"
             >
                 
                 <columns>

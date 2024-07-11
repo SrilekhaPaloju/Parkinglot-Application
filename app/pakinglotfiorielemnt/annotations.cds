@@ -1,16 +1,14 @@
 using CatalogService from '../../srv/cat-service';
 
 annotate CatalogService.ParkingLot with @(UI: {
-    SelectionFields       : [
+    SelectionFields: [
         parkingLotNumber,
-        Assignedslots.driverName,
-        Assignedslots.vehicleNumber,
-        Assignedslots.trasnporTtype
+        status,
     ],
-    HeaderInfo            : {
+    HeaderInfo     : {
         $Type         : 'UI.HeaderInfoType',
         TypeName      : 'Header',
-        TypeNamePlural: 'Assigned Slots',
+        TypeNamePlural: 'All Slots',
 
     },
     Identification        : [{
@@ -18,55 +16,25 @@ annotate CatalogService.ParkingLot with @(UI: {
         Action: 'CatalogService.Edit',
         Label : '{i18n>Edit}'
     }],
-    LineItem              : [
+     LineItem         : [
         {
             $Type : 'UI.DataFieldForAction',
             Action: 'CatalogService.Edit',
             Label : '{i18n>Edit}'
         },
         {
-            Value: parkingLotNumber,
-            Label: 'Parking Lot Number'
+            $Type: 'UI.DataField',
+            Value: parkingLotNumber
         },
         {
-            Value: Assignedslots.vehicleNumber,
-            Label: 'Vehicle Number'
-        },
-        {
-            Value: Assignedslots.driverName,
-            Label: 'Assignedslots Name'
-        },
-        {
-            Value: Assignedslots.trasnporTtype,
-            Label: 'Transport Type'
-        },
-        {
-            Value: Assignedslots.phoneNumber,
-            Label: 'Phone Number'
-        },
-        {
-            Value: Assignedslots.inTime,
-            Label: 'In Time'
-        },
-        {
-            Value: Assignedslots.outTime,
-            Label: 'Out Time'
+            $Type: 'UI.DataField',
+            Value: status
         }
     ],
-    Facets                : [
-        {
-            $Type : 'UI.ReferenceFacet',
-            Label : 'Parking Lot Information',
-            Target: '@UI.FieldGroup#ParkingLot'
-        },
-        {
-            $Type : 'UI.ReferenceFacet',
-            Label : 'Data Visualization',
-            Target: '@UI.Identification'
-        }
-    ],
-    FieldGroup #ParkingLot: {Data: [
-        {
+    FieldGroup  : {
+        $Type : 'UI.FieldGroupType',
+        Data :[
+             {
             Label: 'Parking Lot Number',
             Value: parkingLotNumber
         },
@@ -94,7 +62,16 @@ annotate CatalogService.ParkingLot with @(UI: {
             Label: 'Transport Type',
             Value: Assignedslots.trasnporTtype
         }
-    ]}
+        ]
+    },
 });
 
-annotate CatalogService.ParkingLot with @(Capabilities.InsertRestrictions: {Insertable: true});
+annotate CatalogService.ParkingLot with @(
+    UI.Facets: [
+    {
+        $Type : 'UI.ReferenceFacet',
+        ID    : 'GeneralInformationFacet',
+        Label : 'General Information',
+        Target: '@UI.FieldGroup'
+    }
+]);

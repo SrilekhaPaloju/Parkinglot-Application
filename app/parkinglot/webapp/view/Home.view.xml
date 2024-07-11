@@ -36,20 +36,26 @@
                 items="{/AssignedLots}"
                 selectionChange="onSelectSlot"
                 growingThreshold="10"
-               
             >
                 <headerToolbar>
                     <OverflowToolbar id="idSlotsTableHeader">
                         <Title
                             id="idTableHeaderTitle"
-                            text="Assigned Slots"
+                            text="Assigned Slots: {/AssignedLots/$count}"
                         />
                         <ToolbarSpacer id="idTableHeaderSpacer" />
+                        <Button
+                            id="dataButton"
+                            text="DataVisualization"
+                            type="Transparent"
+                            press="onDatavisualization"
+                        />
                         <Button
                             id="editButton"
                             text="Edit"
                             type="Transparent"
                             press="onEdit"
+                            icon="sap-icon://edit"
                         />
                         <Button
                             id="saveButton"
@@ -57,6 +63,7 @@
                             type="Transparent"
                             press="onSave"
                             visible="false"
+                            icon="sap-icon://save"
                         />
                         <Button
                             id="cancelButton"
@@ -64,6 +71,7 @@
                             type="Transparent"
                             press="onCancel"
                             visible="false"
+                            icon="sap-icon://decline"
                         />
                         <Button
                             id="idBtnCreate"
@@ -83,6 +91,7 @@
                             type="Default"
                             press="onHistorylotPress"
                             text="History"
+                            icon="sap-icon://customer-history"
                         />
                     </OverflowToolbar>
                 </headerToolbar>
@@ -174,7 +183,7 @@
                                     id="idparkingLotNumberColValue"
                                     text="{parkinglot/parkingLotNumber}"
                                 />
-                                <Select
+                                <!-- <Select
                                     id="editparkingLotSelect"
                                     selectedKey=""
                                     items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'EQ', value1: 'Available'}],  templateShareable: true}"
@@ -185,7 +194,20 @@
                                         key="{parkingLotNumber}"
                                         text="{parkingLotNumber}"
                                     />
-                                </Select>
+                                </Select> -->
+                                <ComboBox
+                                    id="parkingLotSelectComboBox"
+                                    selectedKey="{parkinglot_parkingLotNumber}"
+                                    editable="{viewModel>/isEditable}"
+                                    items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'NE', value1: 'Occupied'}], parameters:{$count:true}, templateShareable:true }"
+                                    visible="false"
+                                >
+                                    <core:Item
+                                        id="IDParkinglotnumgen"
+                                        key="{parkingLotNumber}"
+                                        text="{parkingLotNumber}"
+                                    />
+                                </ComboBox>
                             </VBox>
                             <VBox>
                                 <Text
@@ -193,9 +215,9 @@
                                     text="{driverName}"
                                 />
                                 <Input
+                                    id="iddriverInputcol"
                                     value="{driverName}"
                                     visible="false"
-                                    
                                 />
                             </VBox>
                             <VBox>
@@ -204,6 +226,7 @@
                                     text="{phoneNumber}"
                                 />
                                 <Input
+                                    id="idphonenumberInputcol"
                                     value="{phoneNumber}"
                                     visible="false"
                                 />
@@ -214,6 +237,7 @@
                                     text="{vehicleNumber}"
                                 />
                                 <Input
+                                    id="idvehicleInputcolvalue"
                                     value="{vehicleNumber}"
                                     visible="false"
                                 />
@@ -224,6 +248,7 @@
                                     text="{trasnporTtype}"
                                 />
                                 <Input
+                                    id="idtransportInput"
                                     value="{trasnporTtype}"
                                     visible="false"
                                 />

@@ -1,7 +1,7 @@
 {
   "_version": "1.59.0",
   "sap.app": {
-    "id": "com.app.parkinglot",
+    "id": "com.app.vendorapplication",
     "type": "application",
     "i18n": "i18n/i18n.properties",
     "applicationVersion": {
@@ -12,8 +12,8 @@
     "resources": "resources.json",
     "sourceTemplate": {
       "id": "@sap/generator-fiori:basic",
-      "version": "1.14.0",
-      "toolsId": "43e1f933-7779-4217-aa98-dfe86380da0f"
+      "version": "1.14.1",
+      "toolsId": "ffbdcb78-2d09-42ab-b673-06b2119e8e40"
     },
     "dataSources": {
       "mainService": {
@@ -22,14 +22,6 @@
         "settings": {
           "annotations": [],
           "odataVersion": "4.0"
-        }
-      },
-      "mainServiceV2": {
-        "uri": "/v2/odata/v4/catalog/",
-        "type": "OData",
-        "settings": {
-          "annotations": [],
-          "odataVersion": "2.0"
         }
       }
     }
@@ -58,14 +50,11 @@
         "sap.m": {},
         "sap.ui.core": {},
         "sap.f": {},
-        "sap.viz": {},
         "sap.suite.ui.generic.template": {},
         "sap.ui.comp": {},
         "sap.ui.generic.app": {},
         "sap.ui.table": {},
         "sap.ushell": {}
-     
-      
       }
     },
     "contentDensities": {
@@ -76,7 +65,7 @@
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
-          "bundleName": "com.app.parkinglot.i18n.i18n"
+          "bundleName": "com.app.vendorapplication.i18n.i18n"
         }
       },
       "": {
@@ -86,16 +75,6 @@
           "operationMode": "Server",
           "autoExpandSelect": true,
           "earlyRequests": true
-        }
-      },
-      "ModelV2": {
-        "dataSource": "mainServiceV2",
-        "preload": true,
-        "settings": {
-            "synchronizationMode": "None",
-            "operationMode": "Server",
-            "autoExpandSelect": true,
-            "earlyRequests": true
         }
       }
     },
@@ -111,7 +90,7 @@
         "routerClass": "sap.m.routing.Router",
         "viewType": "XML",
         "async": true,
-        "viewPath": "com.app.parkinglot.view",
+        "viewPath": "com.app.vendorapplication.view",
         "controlAggregation": "pages",
         "controlId": "app",
         "clearControlAggregation": false
@@ -123,20 +102,6 @@
           "target": [
             "TargetHome"
           ]
-        },
-        {
-          "name": "RouteInformation",
-          "pattern": "RouteInformation/{ParkingLotId}/",
-          "target": [
-            "TargetInformation"
-          ]
-        },
-        {
-          "name": "RouteData",
-          "pattern": "RouteData",
-          "target": [
-            "TargetData"
-          ]
         }
       ],
       "targets": {
@@ -146,25 +111,11 @@
           "clearControlAggregation": false,
           "viewId": "Home",
           "viewName": "Home"
-        },
-        "TargetInformation": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "Information",
-          "viewName": "Information"
-        },
-        "TargetData": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "DataVisualization",
-          "viewName": "DataVisualization"
         }
       }
     },
     "rootView": {
-      "viewName": "com.app.parkinglot.view.App",
+      "viewName": "com.app.vendorapplication.view.App",
       "type": "XML",
       "async": true,
       "id": "App"
