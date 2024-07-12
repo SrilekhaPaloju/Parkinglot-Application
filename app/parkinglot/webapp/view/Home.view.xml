@@ -12,7 +12,7 @@
         headerExpanded="true"
     >
         <f:title>
-            <f:DynamicPageTitle id="idSlotsListPageTitle">
+            <f:DynamicPageTitle id="idSlotsListPageTitle" class="title">
                 <f:heading>
                     <Title
                         id="idSlotsPageHeadingTitle"
@@ -27,7 +27,7 @@
                 </f:expandedContent>
             </f:DynamicPageTitle>
         </f:title>
-        <f:content>
+        <f:content >
             <Table
                 id="idSlotsTable"
                 growing="true"
@@ -36,6 +36,7 @@
                 items="{/AssignedLots}"
                 selectionChange="onSelectSlot"
                 growingThreshold="10"
+                class="body"
             >
                 <headerToolbar>
                     <OverflowToolbar id="idSlotsTableHeader">
@@ -44,11 +45,18 @@
                             text="Assigned Slots: {/AssignedLots/$count}"
                         />
                         <ToolbarSpacer id="idTableHeaderSpacer" />
-                        <Button
+                        <!-- <Button
                             id="dataButton"
                             text="DataVisualization"
                             type="Transparent"
                             press="onDatavisualization"
+                        /> -->
+                        <Button
+                            id="idBtnCreate"
+                            icon="sap-icon://shipping-status"
+                            type="Accept"
+                            press="onCreatelotPress"
+                            text="ParkingLot Allocation"
                         />
                         <Button
                             id="editButton"
@@ -57,7 +65,7 @@
                             press="onEdit"
                             icon="sap-icon://edit"
                         />
-                        <Button
+                         <Button
                             id="saveButton"
                             text="Save"
                             type="Transparent"
@@ -74,28 +82,44 @@
                             icon="sap-icon://decline"
                         />
                         <Button
-                            id="idBtnCreate"
-                            icon="sap-icon://shipping-status"
-                            type="Accept"
-                            press="onCreatelotPress"
-                            text="ParkingLot Allocation"
-                        />
-                        <Button
                             id="idBtnUnassign"
                             type="Default"
                             press="onUnassignlotPress"
                             text="Unassign"
                         />
-                        <Button
+                        <!-- <Button
                             id="idBtnHistory"
                             type="Default"
                             press="onHistorylotPress"
                             text="History"
                             icon="sap-icon://customer-history"
-                        />
+                        /> -->
+                         <MenuButton
+                            id="idMenuButton"
+                            text="More"
+                            menu="{menu}"
+                        >
+                            <Menu
+                                id="idActionsMenu"
+                            >
+                                <MenuItem
+                                    id="idMenuItemHistory"
+                                    text="History"
+                                    icon="sap-icon://customer-history"
+                                    press="onHistorylotPress"
+                                />
+                                <MenuItem
+                                    id="idMenuItemDataVisualization"
+                                    text="Data Visualization"
+                                    icon="sap-icon://bar-chart"
+                                    press="onDatavisualization"
+                                />
+                            </Menu>
+                        </MenuButton>
+        
                     </OverflowToolbar>
                 </headerToolbar>
-                <columns>
+                <columns >
                     <Column
                         id="idParkingLotNoCol"
                         width="12em"

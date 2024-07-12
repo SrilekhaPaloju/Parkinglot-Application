@@ -49,169 +49,336 @@ sap.ui.define([
       oRouter.navTo("RouteData")
     },
 
+    // onAssignPress: async function () {
+    //   const oUserView = this.getView()
+    //   var sParkingLotNumber = this.byId("parkingLotSelect").getSelectedKey();
+    //   var sVehicleNumber = this.byId("_IDGenInput2").getValue();
+    //   var sDriverName = this.byId("_IDDriverInput2").getValue();
+    //   var sPhoneNumber = this.byId("_IDPhnnoInput2").getValue();
+    //   var sTransportType = this.byId("country").getSelectedKey();
+
+    //   const parkingModel = new sap.ui.model.json.JSONModel({
+    //     driverName: sDriverName,
+    //     phoneNumber: sPhoneNumber,
+    //     vehicleNumber: sVehicleNumber,
+    //     trasnporTtype: sTransportType,
+    //     inTime: new Date(),
+    //     outTime: null,
+    //     parkinglot: {
+    //       parkingLotNumber: sParkingLotNumber,
+    //     }
+    //   })
+
+    //   var bValid = true;
+    //   if (!sDriverName || sDriverName.length < 4) {
+    //     oUserView.byId("_IDDriverInput2").setValueState("Error");
+    //     oUserView.byId("_IDDriverInput2").setValueStateText("Name Must Contain 3 Characters");
+    //     bValid = false;
+    //   } else {
+    //     oUserView.byId("_IDDriverInput2").setValueState("None");
+    //   }
+    //   if (!sPhoneNumber || sPhoneNumber.length !== 10 || !/^\d+$/.test(sPhoneNumber)) {
+    //     oUserView.byId("_IDPhnnoInput2").setValueState("Error");
+    //     oUserView.byId("_IDPhnnoInput2").setValueStateText("Mobile number must be a 10-digit numeric value");
+
+    //     bValid = false;
+    //   } else {
+    //     oUserView.byId("_IDPhnnoInput2").setValueState("None");
+    //   }
+    //   if (!sVehicleNumber || !/^[A-Za-z]{2}\d{2}[A-Za-z]{2}\d{4}$/.test(sVehicleNumber)) {
+    //     oUserView.byId("_IDGenInput2").setValueState("Error");
+    //     oUserView.byId("_IDGenInput2").setValueStateText("Vehicle number should follow this pattern AP12BG1234");
+
+    //     bValid = false;
+    //   } else {
+    //     oUserView.byId("_IDGenInput2").setValueState("None");
+    //   }
+    //   if (!sTransportType) {
+    //     oUserView.byId("country").setValueState("Error");
+    //     bValid = false;
+    //   } else {
+    //     oUserView.byId("country").setValueState("None");
+    //   }
+    //   if (!sParkingLotNumber) {
+    //     oUserView.byId("parkingLotSelect").setValueState("Error");
+    //     bValid = false;
+    //   } else {
+    //     oUserView.byId("parkingLotSelect").setValueState("None");
+    //   }
+
+    //   if (!bValid) {
+    //     MessageToast.show("Please enter correct data");
+    //     return; // Prevent further execution
+
+    //   }
+    //   const oModel = this.getView().getModel("ModelV2");
+    // const oParkingLotData = await oModel.read("/ParkingLot('" + sParkingLotNumber + "')");
+
+    // if (oParkingLotData.status === "Occupied") {
+    //     MessageBox.error("The selected parking lot is already occupied. Please select a different parking lot.");
+    //     return; // Prevent further execution
+    // }
+
+    //   else {
+    //     this.getView().setModel(parkingModel, "parkingModel");
+    //     // this.getView().byId("idSlotsTable").getBinding("items");
+    //     const oPayload = this.getView().getModel("parkingModel").getProperty("/");
+    //     const oModel = this.getView().getModel("ModelV2");
+    //     this.createData(oModel, oPayload, "/AssignedLots")
+    //     this.oAssignedslotDialog.close();
+    //     MessageToast.show("ParkingLot Assigned Successfully")
+    //     this.getView.byId("idSlotsTable").getBinding("items").refresh();
+
+      
+    //     const updatedParkingLot = {
+    //       status: "Occupied" // Assuming false represents empty parking
+    //       // Add other properties if needed
+    //     };
+    //     oModel.update("/ParkingLot('" + sParkingLotNumber + "')", updatedParkingLot, {
+    //       success: function () {
+    //       }.bind(this),
+    //       error: function (oError) {
+
+    //         sap.m.MessageBox.error("Failed to update: " + oError.message);
+    //       }.bind(this)
+    //     });
+
+    //     // oUserView.byId("_IDLoginGenInput").setValue("iddriverInputcol");
+    //     // oUserView.byId("_IDGenLoginInput1").setValue("idphonenumberInputcol");
+    //     // oUserView.byId("_IDGenLoginInput1").setValue("idvehicleInputcolvalue");
+
+    //   }
+    // },
     onAssignPress: async function () {
-      const oUserView = this.getView()
+      const oUserView = this.getView();
       var sParkingLotNumber = this.byId("parkingLotSelect").getSelectedKey();
       var sVehicleNumber = this.byId("_IDGenInput2").getValue();
       var sDriverName = this.byId("_IDDriverInput2").getValue();
       var sPhoneNumber = this.byId("_IDPhnnoInput2").getValue();
       var sTransportType = this.byId("country").getSelectedKey();
-
+  
       const parkingModel = new sap.ui.model.json.JSONModel({
-        driverName: sDriverName,
-        phoneNumber: sPhoneNumber,
-        vehicleNumber: sVehicleNumber,
-        trasnporTtype: sTransportType,
-        inTime: new Date(),
-        outTime: null,
-        parkinglot: {
-          parkingLotNumber: sParkingLotNumber,
-        }
-      })
-
+          driverName: sDriverName,
+          phoneNumber: sPhoneNumber,
+          vehicleNumber: sVehicleNumber,
+          trasnporTtype: sTransportType,
+          inTime: new Date(),
+          outTime: null,
+          parkinglot: {
+              parkingLotNumber: sParkingLotNumber,
+          }
+      });
+  
       var bValid = true;
       if (!sDriverName || sDriverName.length < 4) {
-        oUserView.byId("_IDDriverInput2").setValueState("Error");
-        oUserView.byId("_IDDriverInput2").setValueStateText("Name Must Contain 3 Characters");
-        bValid = false;
+          oUserView.byId("_IDDriverInput2").setValueState("Error");
+          oUserView.byId("_IDDriverInput2").setValueStateText("Name Must Contain 4 Characters");
+          bValid = false;
       } else {
-        oUserView.byId("_IDDriverInput2").setValueState("None");
+          oUserView.byId("_IDDriverInput2").setValueState("None");
       }
       if (!sPhoneNumber || sPhoneNumber.length !== 10 || !/^\d+$/.test(sPhoneNumber)) {
-        oUserView.byId("_IDPhnnoInput2").setValueState("Error");
-        oUserView.byId("_IDPhnnoInput2").setValueStateText("Mobile number must be a 10-digit numeric value");
-
-        bValid = false;
+          oUserView.byId("_IDPhnnoInput2").setValueState("Error");
+          oUserView.byId("_IDPhnnoInput2").setValueStateText("Mobile number must be a 10-digit numeric value");
+          bValid = false;
       } else {
-        oUserView.byId("_IDPhnnoInput2").setValueState("None");
+          oUserView.byId("_IDPhnnoInput2").setValueState("None");
       }
       if (!sVehicleNumber || !/^[A-Za-z]{2}\d{2}[A-Za-z]{2}\d{4}$/.test(sVehicleNumber)) {
-        oUserView.byId("_IDGenInput2").setValueState("Error");
-        oUserView.byId("_IDGenInput2").setValueStateText("Vehicle number should follow this pattern AP12BG1234");
-
-        bValid = false;
+          oUserView.byId("_IDGenInput2").setValueState("Error");
+          oUserView.byId("_IDGenInput2").setValueStateText("Vehicle number should follow this pattern AP12BG1234");
+          bValid = false;
       } else {
-        oUserView.byId("_IDGenInput2").setValueState("None");
+          oUserView.byId("_IDGenInput2").setValueState("None");
       }
       if (!sTransportType) {
-        oUserView.byId("country").setValueState("Error");
-        bValid = false;
+          oUserView.byId("country").setValueState("Error");
+          bValid = false;
       } else {
-        oUserView.byId("country").setValueState("None");
+          oUserView.byId("country").setValueState("None");
       }
       if (!sParkingLotNumber) {
-        oUserView.byId("parkingLotSelect").setValueState("Error");
-        bValid = false;
+          oUserView.byId("parkingLotSelect").setValueState("Error");
+          bValid = false;
       } else {
-        oUserView.byId("parkingLotSelect").setValueState("None");
+          oUserView.byId("parkingLotSelect").setValueState("None");
       }
-
+  
       if (!bValid) {
-        MessageToast.show("Please enter correct data");
-        return; // Prevent further execution
-
+          MessageToast.show("Please enter correct data");
+          return; // Prevent further execution
       }
+  
       const oModel = this.getView().getModel("ModelV2");
-    const oParkingLotData = await oModel.read("/ParkingLot('" + sParkingLotNumber + "')");
+      const oParkingLotData = await oModel.read("/ParkingLot('" + sParkingLotNumber + "')");
+  
+      if (oParkingLotData.status === "Occupied") {
+          MessageBox.error("The selected parking lot is already occupied. Please select a different parking lot.");
+          return; // Prevent further execution
+      } else {
+          this.getView().setModel(parkingModel, "parkingModel");
+          const oPayload = this.getView().getModel("parkingModel").getProperty("/");
+          this.createData(oModel, oPayload, "/AssignedLots");
+  
+          this.oAssignedslotDialog.close();
+          MessageToast.show("ParkingLot Assigned Successfully");
+  
+          const updatedParkingLot = {
+              status: "Occupied"
+          };
+          
+          oModel.update("/ParkingLot('" + sParkingLotNumber + "')", updatedParkingLot, {
+              success: function () {
+                  // Refresh the idSlotsTable binding
+                  this.getView().byId("idSlotsTable").getBinding("items").refresh();
+                  this.getView().byId("parkingLotSelect").getBinding("items").refresh();
 
-    if (oParkingLotData.status === "Occupied") {
-        MessageBox.error("The selected parking lot is already occupied. Please select a different parking lot.");
-        return; // Prevent further execution
-    }
-
-      else {
-        this.getView().setModel(parkingModel, "parkingModel");
-        // this.getView().byId("idSlotsTable").getBinding("items");
-        const oPayload = this.getView().getModel("parkingModel").getProperty("/");
-        const oModel = this.getView().getModel("ModelV2");
-        this.createData(oModel, oPayload, "/AssignedLots")
-        this.oAssignedslotDialog.close();
-        MessageToast.show("ParkingLot Assigned Successfully")
-        this.getView().byId("idSlotsTable").getBinding("items").refresh();
-
-      
-        const updatedParkingLot = {
-          status: "Occupied" // Assuming false represents empty parking
-          // Add other properties if needed
-        };
-        oModel.update("/ParkingLot('" + sParkingLotNumber + "')", updatedParkingLot, {
-          success: function () {
-          }.bind(this),
-          error: function (oError) {
-
-            sap.m.MessageBox.error("Failed to update: " + oError.message);
-          }.bind(this)
-        });
-
-        // oUserView.byId("_IDLoginGenInput").setValue("iddriverInputcol");
-        // oUserView.byId("_IDGenLoginInput1").setValue("idphonenumberInputcol");
-        // oUserView.byId("_IDGenLoginInput1").setValue("idvehicleInputcolvalue");
-
+                  // Reset the input fields
+                oUserView.byId("parkingLotSelect").setSelectedKey("");
+                oUserView.byId("_IDGenInput2").setValue("");
+                oUserView.byId("_IDDriverInput2").setValue("");
+                oUserView.byId("_IDPhnnoInput2").setValue("");
+                oUserView.byId("country").setSelectedKey("");
+              }.bind(this),
+              error: function (oError) {
+                  sap.m.MessageBox.error("Failed to update: " + oError.message);
+              }.bind(this)
+          });
       }
-    },
+  },
+  
+    // onUnassignlotPress: async function () {
+    //   debugger;
+    //   const oView = this.getView()
+    //   var oSelected = this.byId("idSlotsTable").getSelectedItem();
+    //   if (!oSelected) {
+    //     sap.m.MessageToast.show("Please select a vehicle to unassign");
+    //     return;
+    //   }
+    //   if (oSelected) {
+    //     var sVehicle = oSelected.getBindingContext().getObject().vehicleNumber;
+    //     var sSlotNumber = oSelected.getBindingContext().getObject().parkinglot.parkingLotNumber;
+    //     var sDriverName = oSelected.getBindingContext().getObject().driverName
+    //     var sTypeofDelivery = oSelected.getBindingContext().getObject().trasnporTtype
+    //     var sDriverMobile = oSelected.getBindingContext().getObject().phoneNumber
+    //     var dCheckInTime = oSelected.getBindingContext().getObject().inTime
+    //     var oStatus = oSelected.getBindingContext().getObject().parkinglot.status;
+    //     var currentDate = new Date();
+
+    //     // create a record in history
+    //     const oNewHistory = new sap.ui.model.json.JSONModel({
+    //       driverName: sDriverName,
+    //       driverMobile: sDriverMobile,
+    //       vehicleNumber: sVehicle,
+    //       deliveryType: sTypeofDelivery,
+    //       checkInTime: dCheckInTime,
+    //       historySlotNumber_parkingLotNumber: sSlotNumber,
+    //       checkOutTime: currentDate
+    //     })
+    //     oView.setModel(oNewHistory, "oNewHistory");
+
+    //     var oParkingslot = new sap.ui.model.json.JSONModel({
+    //       parkingLotNumber: sSlotNumber,
+    //       status: oStatus // Corrected spelling to 'available'
+    //     });
+    //     oView.setModel(oParkingslot, "oParkingslot");
+    //     try {
+    //       const oPayload = this.getView().getModel("oNewHistory").getProperty("/");
+    //       // const oData = this.getView().getModel("oParkingslot").getProperty("/");
+    //       const oModel = this.getView().getModel("ModelV2");
+    //       this.createData(oModel, oPayload, "/History")
+    //       oSelected.getBindingContext().delete("$auto").then(function () {
+    //         MessageToast.show("Unassigned sucessfully")
+    //         oThis.getView().byId("idSlotsTable").getBinding("items").refresh();
+    //         this.getView().byId("idHistorySlotsTable").getBinding("items").refresh();
+    //       })
+    //       const updatedParkingLot = {
+    //         status: "Available" // Assuming false represents empty parking
+    //         // Add other properties if needed
+    //       };
+    //       oModel.update("/ParkingLot('" + sSlotNumber + "')", updatedParkingLot, {
+    //         success: function () {
+    //         }.bind(this),
+    //         error: function (oError) {
+    //           sap.m.MessageBox.error("Failed to update: " + oError.message);
+    //         }.bind(this)
+    //       });
+
+    //     } catch (error) {
+    //       console.error("Error:", error);
+    //       sap.m.MessageToast.show("Failed to unassign vehicle: " + error.message);
+    //     }
+    //   }
+    // },
+
     onUnassignlotPress: async function () {
       debugger;
-      const oView = this.getView()
+      const oView = this.getView();
       var oSelected = this.byId("idSlotsTable").getSelectedItem();
       if (!oSelected) {
-        sap.m.MessageToast.show("Please select a vehicle to unassign");
-        return;
+          sap.m.MessageToast.show("Please select a vehicle to unassign");
+          return;
       }
+  
       if (oSelected) {
-        var sVehicle = oSelected.getBindingContext().getObject().vehicleNumber;
-        var sSlotNumber = oSelected.getBindingContext().getObject().parkinglot.parkingLotNumber;
-        var sDriverName = oSelected.getBindingContext().getObject().driverName
-        var sTypeofDelivery = oSelected.getBindingContext().getObject().trasnporTtype
-        var sDriverMobile = oSelected.getBindingContext().getObject().phoneNumber
-        var dCheckInTime = oSelected.getBindingContext().getObject().inTime
-        var oStatus = oSelected.getBindingContext().getObject().parkinglot.status;
-        var currentDate = new Date();
-
-        // create a record in history
-        const oNewHistory = new sap.ui.model.json.JSONModel({
-          driverName: sDriverName,
-          driverMobile: sDriverMobile,
-          vehicleNumber: sVehicle,
-          deliveryType: sTypeofDelivery,
-          checkInTime: dCheckInTime,
-          historySlotNumber_parkingLotNumber: sSlotNumber,
-          checkOutTime: currentDate
-        })
-        oView.setModel(oNewHistory, "oNewHistory");
-
-        var oParkingslot = new sap.ui.model.json.JSONModel({
-          parkingLotNumber: sSlotNumber,
-          status: oStatus // Corrected spelling to 'available'
-        });
-        oView.setModel(oParkingslot, "oParkingslot");
-        try {
-          const oPayload = this.getView().getModel("oNewHistory").getProperty("/");
-          // const oData = this.getView().getModel("oParkingslot").getProperty("/");
-          const oModel = this.getView().getModel("ModelV2");
-          this.createData(oModel, oPayload, "/History")
-          oSelected.getBindingContext().delete("$auto").then(function () {
-            MessageToast.show("Unassigned sucessfully")
-            oThis.getView().byId("idSlotsTable").getBinding("items").refresh();
-            this.getView().byId("idHistorySlotsTable").getBinding("items").refresh();
-          })
-          const updatedParkingLot = {
-            status: "Available" // Assuming false represents empty parking
-            // Add other properties if needed
-          };
-          oModel.update("/ParkingLot('" + sSlotNumber + "')", updatedParkingLot, {
-            success: function () {
-            }.bind(this),
-            error: function (oError) {
-              sap.m.MessageBox.error("Failed to update: " + oError.message);
-            }.bind(this)
+          var sVehicle = oSelected.getBindingContext().getObject().vehicleNumber;
+          var sSlotNumber = oSelected.getBindingContext().getObject().parkinglot.parkingLotNumber;
+          var sDriverName = oSelected.getBindingContext().getObject().driverName;
+          var sTypeofDelivery = oSelected.getBindingContext().getObject().trasnporTtype;
+          var sDriverMobile = oSelected.getBindingContext().getObject().phoneNumber;
+          var dCheckInTime = oSelected.getBindingContext().getObject().inTime;
+          var oStatus = oSelected.getBindingContext().getObject().parkinglot.status;
+          var currentDate = new Date();
+  
+          // Create a record in history
+          const oNewHistory = new sap.ui.model.json.JSONModel({
+              driverName: sDriverName,
+              driverMobile: sDriverMobile,
+              vehicleNumber: sVehicle,
+              deliveryType: sTypeofDelivery,
+              checkInTime: dCheckInTime,
+              historySlotNumber_parkingLotNumber: sSlotNumber,
+              checkOutTime: currentDate
           });
-
-        } catch (error) {
-          console.error("Error:", error);
-          sap.m.MessageToast.show("Failed to unassign vehicle: " + error.message);
-        }
+          oView.setModel(oNewHistory, "oNewHistory");
+  
+          var oParkingslot = new sap.ui.model.json.JSONModel({
+              parkingLotNumber: sSlotNumber,
+              status: oStatus
+          });
+          oView.setModel(oParkingslot, "oParkingslot");
+  
+          try {
+              const oPayload = this.getView().getModel("oNewHistory").getProperty("/");
+              const oModel = this.getView().getModel("ModelV2");
+              this.createData(oModel, oPayload, "/History");
+  
+              oSelected.getBindingContext().delete("$auto").then(function () {
+                  MessageToast.show("Unassigned successfully");
+                  this.getView().byId("idSlotsTable").getBinding("items").refresh();
+                  this.getView().byId("idHistorySlotsTable").getBinding("items").refresh();
+                  this.getView().byId("parkingLotSelect").getBinding("items").refresh(); // Refresh parking lot select
+              }.bind(this));
+  
+              const updatedParkingLot = {
+                  status: "Available"
+              };
+              oModel.update("/ParkingLot('" + sSlotNumber + "')", updatedParkingLot, {
+                  success: function () {
+                      // Additional logic can be added here if needed
+                  }.bind(this),
+                  error: function (oError) {
+                      sap.m.MessageBox.error("Failed to update: " + oError.message);
+                  }.bind(this)
+              });
+  
+          } catch (error) {
+              console.error("Error:", error);
+              sap.m.MessageToast.show("Failed to unassign vehicle: " + error.message);
+          }
       }
-    },
+  },
+  
     onEdit: function () {
       var oTable = this.byId("idSlotsTable");
       var aSelectedItems = oTable.getSelectedItems();

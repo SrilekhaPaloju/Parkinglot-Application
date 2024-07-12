@@ -4,3 +4,19 @@
     margin: auto;
     margin-left: 2rem;
 }
+.title {
+    background-color: #09c8f5;
+    background-image: linear-gradient(to bottom, #09c8f5, #ffffff);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.body {
+    background-color: #a4e6e9ea; /* Light green */
+    background-image: linear-gradient(to bottom, #92e8edea, #a5e5a7); /* Gradient to even lighter green */
+    color: #333333; /* Dark text for contrast */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+}
+.textcolor{
+    color: #ffff;
+    transform: translate;
+}
