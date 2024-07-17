@@ -28,10 +28,17 @@ entity History : cuid {
   checkInTime       : DateTime;
   checkOutTime      : DateTime;
   historySlotNumber : Association to ParkingLot;
-  
 
 }
-
+ entity Reservations : cuid {
+   vendorName :String;
+   vehicleNumber :String;
+   driverName:String;
+   mobileNumber:String;
+   processType:String;
+   reserveTime :DateTime;
+   parkingslot :Association to ParkingLot;
+ }
 
 
 

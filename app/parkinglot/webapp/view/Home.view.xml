@@ -25,6 +25,13 @@
                         text="{i18n>SubTitle}"
                     />
                 </f:expandedContent>
+                 <f:actions>
+                    <Button
+                        icon="sap-icon://bell"
+                        press="onNotificationPress"
+                        type="Transparent"
+                    />
+                </f:actions>
             </f:DynamicPageTitle>
         </f:title>
         <f:content >
@@ -97,7 +104,6 @@
                          <MenuButton
                             id="idMenuButton"
                             text="More"
-                            menu="{menu}"
                         >
                             <Menu
                                 id="idActionsMenu"
@@ -113,6 +119,13 @@
                                     text="Data Visualization"
                                     icon="sap-icon://bar-chart"
                                     press="onDatavisualization"
+                                />
+                                <MenuItem
+                                    id="idMenuItemReservation"
+                                    text="Reserved slots"
+                                    icon="sap-icon://time-entry-request"
+                                    press="onReservation"
+                                    
                                 />
                             </Menu>
                         </MenuButton>
@@ -207,23 +220,10 @@
                                     id="idparkingLotNumberColValue"
                                     text="{parkinglot/parkingLotNumber}"
                                 />
-                                <!-- <Select
-                                    id="editparkingLotSelect"
-                                    selectedKey=""
-                                    items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'EQ', value1: 'Available'}],  templateShareable: true}"
-                                    visible="false"
-                                >
-                                    <core:Item
-                                        id="IDcoreitem"
-                                        key="{parkingLotNumber}"
-                                        text="{parkingLotNumber}"
-                                    />
-                                </Select> -->
                                 <ComboBox
                                     id="parkingLotSelectComboBox"
                                     selectedKey="{parkinglot_parkingLotNumber}"
-                                    editable="{viewModel>/isEditable}"
-                                    items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'NE', value1: 'Occupied'}], parameters:{$count:true}, templateShareable:true }"
+                                    items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'EQ', value1: 'Available'}], parameters:{$count:true}, templateShareable:true }"
                                     visible="false"
                                 >
                                     <core:Item
@@ -285,6 +285,7 @@
                                 <Input
                                     value="{inTime}"
                                     visible="false"
+                                    enabled="false"
                                 />
                             </VBox>
                             <VBox>

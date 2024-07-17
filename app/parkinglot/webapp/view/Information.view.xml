@@ -29,7 +29,6 @@
             </ObjectPageDynamicHeaderTitle>
         </headerTitle>
 
-        <!-- Borrowed Books Section -->
         <sections>
             <ObjectPageSection
                 id="idParkingLotInformationSection"
@@ -46,39 +45,7 @@
                     </ObjectPageSubSection>
                 </subSections>
             </ObjectPageSection>
-             <!-- <ObjectPageSection
-                id="idHistory"
-                title="History"
-            >
-                <subSections>
-                    <ObjectPageSubSection id="idHistorySubSection">
-                        <blocks>
-                            <core:Fragment
-                                type="XML"
-                                fragmentName="com.app.parkinglot.fragments.History"
-                            />
-                        </blocks>
-                    </ObjectPageSubSection>
-                </subSections>
-            </ObjectPageSection> -->
-
-            <!-- Total Books Section -->
-            <ObjectPageSection
-                id="idDataVisualization"
-                title="Data Visualization"
-            >
-                <subSections>
-                    <ObjectPageSubSection id="idDataVisualizationSubSection">
-                        <blocks>
-                            <core:Fragment
-                                type="XML"
-                                fragmentName="com.app.parkinglot.fragments.DataVisualization"
-                            />
-                        </blocks>
-                    </ObjectPageSubSection>
-                </subSections>
-            </ObjectPageSection>
-        
         </sections>
+
     </ObjectPageLayout>
 </mvc:View>

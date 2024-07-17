@@ -48,8 +48,7 @@ sap.ui.define(
           error: function (oError) {
             sap.m.MessageBox.error("Failed to update: " + oError.message);
           }.bind(this)
-        });
-       
+        }); 
       },
   });
   });

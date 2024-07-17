@@ -3,7 +3,6 @@
     xmlns="sap.m"
     xmlns:form="sap.ui.layout.form"
 >
-
     <VBox id="_IDGenVBoxlot">
 
         <form:SimpleForm
@@ -18,15 +17,6 @@
                 id="idParkingLotNumberLabel"
                 text="ParkingLot Number"
             />
-            <!-- <ComboBox
-                id="parkingLotSelectComboBox"
-                selectedKey="{parkinglot_parkingLotNumber}"
-                editable="{viewModel>/isEditable}"
-                items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'NE', value1: 'Occupied'}]}"
-            >
-                <core:Item id="IDParkinglotnumgen" key="{parkingLotNumber}"
-                        text="{parkingLotNumber}" />
-            </ComboBox> -->
             <Text
                 id="IDParkinglotnumInput"
                 text="{parkinglot/parkingLotNumber}"
@@ -71,14 +61,14 @@
                 id="idinTimeText"
                 text="{inTime}"
             />
-            <Label
+            <!-- <Label
                 id="idoutTimeLabel"
                 text="Out Time"
             />
             <Text
                 id="idoutTimeText"
                 text=" "
-            />
+            /> -->
             <Label
                 id="idstatusLabel"
                 text="Status"

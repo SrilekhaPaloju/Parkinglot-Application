@@ -4,23 +4,27 @@
     xmlns:form="sap.ui.layout.form"
 >
     <Dialog
-        id="idReserveBooksDailog"
+        id="idHistoryBooksDailog"
         resizable="true"
         draggable="true"
         contentWidth="85%"
-        contentHeight="85%"
-        
-        
+        contentHeight="85%"   
     >
      <customHeader>
-            <Bar id="_IDGenBar1">
-                <contentLeft>
-                    <Text id="_IDGenText1" text="History" />
-                </contentLeft>
+            <Bar id="_IDGenHistoryBar1">
+                 <contentMiddle>
+                    <FlexBox
+                        id="flexboxHistoryHeader"
+                        alignItems="Center"
+                        justifyContent="Center"
+                        width="100%">
+                        <Text id="IDGenHistoryText1" text="ParkingLot History" textAlign="Center" />
+                    </FlexBox>
+                </contentMiddle>
                 <contentRight>
                     <Button
                             class="button"
-                            id="idCloseBookBTN"
+                            id="idCloseHistoryBTN"
                             text="cancel"
                             press="onCloseHistoryDialog"
                             type="Transparent"

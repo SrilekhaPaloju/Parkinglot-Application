@@ -1,0 +1,132 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:form="sap.ui.layout.form"
+>
+    <Dialog
+        id="idReserveBooksDailog"
+        resizable="true"
+        draggable="true"
+        contentWidth="85%"
+        contentHeight="85%"   
+    >
+     <customHeader>
+            <Bar id="IDGenReserveBar">
+                 <contentMiddle>
+                    <FlexBox
+                        id="flexboxReserveHeader"
+                        alignItems="Center"
+                        justifyContent="Center"
+                        width="100%">
+                        <Text id="IDGenReserveText1" text="Reserved Slots" textAlign="Center" />
+                    </FlexBox>
+                </contentMiddle>
+                <contentRight>
+                 <Button
+                            class="button"
+                            id="idAssignBTN"
+                            text="Assign"
+                            press="onAssignDialog"
+                            type="Accept"
+                        />
+                    <Button
+                            class="button"
+                            id="idCloseReserveBTN"
+                            text="cancel"
+                            press="onCloseReserveDialog"
+                            type="Transparent"
+                        />
+                </contentRight>
+            </Bar>
+        </customHeader>
+        <content>
+            <Table
+                id="idReserveSlotsTable"
+                growing="true"
+                mode="SingleSelectMaster"
+                alternateRowColors="false"
+                items="{/Reservations}"
+            >
+                
+                <columns>
+                    <Column id="idReserveParkingLotNoCol">
+                        <Title
+                            id="idReserveParkingLotNoColTitle"
+                            text="ParkingLot Number"
+                        />
+                    </Column>
+                       <Column id="idReserveVendorNoCol">
+                        <Title
+                            id="idReserveVendorNoColTitle"
+                            text="Vendor Name"
+                        />
+                    </Column>
+                    <Column id="idReserveDriverCol">
+                        <Title
+                            id="idReserveDriverColTitle"
+                            text="Driver Name"
+                        />
+                    </Column>
+                    <Column id="idReservePhonenoCol">
+                        <Title
+                            id="idReservePhonenoColTitle"
+                            text="Phone Number"
+                        />
+                    </Column>
+                    <Column id="idReserveVehiclenoCol">
+                        <Title
+                            id="idReserveVehiclenoCol1Title"
+                            text="Vehicle Number"
+                        />
+                    </Column>
+                    <Column id="idReserveTransporttypeCol">
+                        <Title
+                            id="idReserveTransporttypecolTitle"
+                            text="Transport Type"
+                        />
+                    </Column>
+                    <Column id="idReserveIntimeCol">
+                        <Title
+                            id="idReserveIntimecolTitle"
+                            text="Reserved Time"
+                        />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem id="idReserveSlotsTableColListItem">
+                        <cells>
+                            <Text
+                                id="idReserveparkingLotNumberColValue"
+                                text="{parkingslot_parkingLotNumber}"
+                            />
+                             <Text
+                                id="idReservevendorNameColValue"
+                                text="{vendorName}"
+                            />
+                            <Text
+                                id="idReservedriveNameColValue"
+                                text="{driverName}"
+                            />
+                            <Text
+                                id="idReservephoneNumberColValue"
+                                text="{mobileNumber}"
+                            />
+                            <Text
+                                id="idReservevehicleNumberColValue"
+                                text="{vehicleNumber}"
+                            />
+                            <Text
+                                id="idReservetrasnporTtypeColValue"
+                                text="{processType}"
+                            />
+                            <Text
+                                id="idReserveinTimeColValue"
+                                text="{reserveTime}"
+                            />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Dialog>
+</core:FragmentDefinition>
