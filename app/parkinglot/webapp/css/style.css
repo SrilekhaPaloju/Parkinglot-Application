@@ -20,3 +20,9 @@
     color: #ffff;
     transform: translate;
 }
+.customPopoverContent {
+    width: 600px;
+    height: 200px;
+    overflow: auto; /* Optional: Add this to handle overflow content */
+   
+}

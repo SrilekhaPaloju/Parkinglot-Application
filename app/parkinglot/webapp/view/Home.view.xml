@@ -30,7 +30,17 @@
                         icon="sap-icon://bell"
                         press="onNotificationPress"
                         type="Transparent"
-                    />
+                    >
+                    <customData>
+                    <BadgeCustomData 
+                     value="{/Reservations/$count}"
+                            visible="true" >
+                    
+                    
+                    </BadgeCustomData>
+                    </customData>
+                    
+                    </Button>
                 </f:actions>
             </f:DynamicPageTitle>
         </f:title>

@@ -148,7 +148,52 @@ sap.ui.define([
       else {
         this.getView().setModel(parkingModel, "parkingModel");
         const oPayload = this.getView().getModel("parkingModel").getProperty("/");
-        this.createData(oModel, oPayload, "/AssignedLots");
+       var create = this.createData(oModel, oPayload, "/AssignedLots");
+        if (create) {
+          
+            // Replace with your actual Twilio Account SID and Auth Token
+            const accountSid = 'ACb224f5ef242a9b70012285792ef40e8a';
+            const authToken = '7dfb18571a99989245c76f9c1d316162';
+               var to = "+91"+ sPhoneNumber;
+            // Function to send SMS using Twili
+                debugger
+                const toNumber = to ; // Replace with recipient's phone number
+                const fromNumber = '+18149043908'; // Replace with your Twilio phone number
+                const messageBody = 'Hello ' + sDriverName + ',\n' +
+                'Your vehicle (' + sVehicleNumber + ') has been assigned to parking lot ' + sParkingLotNumber + '.\n' +
+                'Please park your vehicle in the assigned slot.\n' +
+                'Thank you,\n'
+
+                // Twilio API endpoint for sending messages
+                const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+
+                // Payload for the POST request
+                const payload = {
+                    To: toNumber,
+                    From: fromNumber,
+                    Body: messageBody
+                };
+
+                // Send POST request to Twilio API using jQuery.ajax
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    headers: {
+                        'Authorization': 'Basic ' + btoa(accountSid + ':' + authToken)
+                    },
+                    data: payload,
+                    success: function (data) {
+                        console.log('SMS sent successfully:', data);
+                        // Handle success, e.g., show a success message
+                        sap.m.MessageToast.show('SMS sent successfully!');
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error sending SMS:', error);
+                        // Handle error, e.g., show an error message
+                        sap.m.MessageToast.show('Failed to send SMS: ' + error);
+                    }
+                });
+        }
 
         this.oAssignedslotDialog.close();
         MessageToast.show("ParkingLot Assigned Successfully");
@@ -500,7 +545,31 @@ sap.ui.define([
           sap.m.MessageToast.show("Failed to assign vehicle: " + error.message);
         }
       }
-    }
+    },
+    onNotificationPress: function (oEvent) {
+      var oButton = oEvent.getSource(),
+          oView = this.getView();
+
+      // create popover
+      if (!this._pPopover) {
+          this._pPopover = this.loadFragment("Notification").then(function (oPopover) {
+              oView.addDependent(oPopover);
+              oPopover.bindElement("");
+              return oPopover;
+          });
+      }
+      this._pPopover.then(function (oPopover) {
+          oPopover.openBy(oButton);
+      });
+  },
+  onItemClose1:function(oEvent){
+    var oItem = oEvent.getSource(),
+    oList = oItem.getParent();
+
+  oList.removeItem(oItem);
+  MessageToast.show("Item Closed: " + oItem.getTitle());
+
+  }
   });
 });
 
