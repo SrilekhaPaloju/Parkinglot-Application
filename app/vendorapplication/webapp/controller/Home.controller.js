@@ -55,6 +55,13 @@ function (Controller,MessageToast) {
       });
   
       var bValid = true;
+      if (!sVendorName || sVendorName.length < 4) {
+        oUserView.byId("_IDGenVendorInput").setValueState("Error");
+        oUserView.byId("_IDGenVendorInput").setValueStateText("Vendor Name cannot be Empty");
+        bValid = false;
+      } else {
+        oUserView.byId("_IDDriverInput2").setValueState("None");
+      }
       if (!sDriverName || sDriverName.length < 4) {
         oUserView.byId("_IDDriverInput2").setValueState("Error");
         oUserView.byId("_IDDriverInput2").setValueStateText("Name Must Contain 3 Characters");
@@ -96,6 +103,13 @@ function (Controller,MessageToast) {
       }
       this.getView().setModel(reserveModel, "reserveModel");
       const oModel = this.getView().getModel("ModelV2");
+
+      var bVehicleExists = await this.checkVehicleExists(oModel, sVehicleNumber);
+
+      if (bVehicleExists) {
+          sap.m.MessageBox.error("The vehicle is already assigned a parking lot.");
+          return; // Prevent further execution
+      }
       const oPayload = this.getView().getModel("reserveModel").getProperty("/");
       
       // Create the reservation entry
@@ -129,9 +143,25 @@ function (Controller,MessageToast) {
       oUserView.byId("_IDPhnnoInput2").setValue("");
       oUserView.byId("idTrasporttype").setSelectedKey("");
       oUserView.byId("_IDDriverInput2").setValue("");
-      oUserView.byId("idDtaetimepicker").setValue("");
       oModel.refresh(true);
   },
+  checkVehicleExists: function(oModel, sVehicleNumber) {
+    return new Promise(function(resolve, reject) {
+        oModel.read("/Reservations", {
+            filters: [new sap.ui.model.Filter("vehicleNumber", sap.ui.model.FilterOperator.EQ, sVehicleNumber)],
+            success: function(oData) {
+                if (oData.results && oData.results.length > 0) {
+                    resolve(true);
+                } else {
+                    resolve(false);
+                }
+            },
+            error: function(oError) {
+                reject(oError);
+            }
+        });
+    });
+},
   
     });
 });

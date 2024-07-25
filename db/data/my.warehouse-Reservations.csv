@@ -1,3 +1,2 @@
 ID,vendorName,vehicleNumber,driverName,mobileNumber,processType,reserveTime,parkingslot_parkingLotNumber
 dcb16d95-7d34-4381-a6e2-0ef1b16e44c9,Vendor A,ABC123,John Doe,1234567890,Inward,2024-07-17T08:00:00Z,PL004
-a49b6d68-f1bb-4c32-b0b7-7d59a65f6f2e,Vendor B,DEF456,Jane Smith,0987654321,Outward,2024-07-17T09:00:00Z,PL005

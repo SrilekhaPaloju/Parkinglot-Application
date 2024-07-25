@@ -1,27 +1,30 @@
 using CatalogService from '../../srv/cat-service';
 
 annotate CatalogService.ParkingLot with @(UI: {
-    SelectionFields: [
+    SelectionFields               : [
         parkingLotNumber,
         status,
     ],
-    HeaderInfo     : {
+    HeaderInfo                    : {
         $Type         : 'UI.HeaderInfoType',
         TypeName      : 'Header',
         TypeNamePlural: 'All Slots',
-
+ 
     },
-    Identification        : [{
-        $Type : 'UI.DataFieldForAction',
-        Action: 'CatalogService.Edit',
-        Label : '{i18n>Edit}'
-    }],
-     LineItem         : [
+    Identification                : [
         {
             $Type : 'UI.DataFieldForAction',
-            Action: 'CatalogService.Edit',
+            Action: 'CatalogService.parkinglotEdit',
             Label : '{i18n>Edit}'
         },
+         {
+                $Type: 'UI.DataFieldForAction',
+                Action:'CatalogService.parkinglotCreate',
+                Label: '{i18n>Create}'
+            }
+    ],
+ 
+    LineItem                      : [
         {
             $Type: 'UI.DataField',
             Value: parkingLotNumber
@@ -31,47 +34,54 @@ annotate CatalogService.ParkingLot with @(UI: {
             Value: status
         }
     ],
-    FieldGroup  : {
-        $Type : 'UI.FieldGroupType',
-        Data :[
-             {
-            Label: 'Parking Lot Number',
-            Value: parkingLotNumber
-        },
-        {
-            Label: 'Vehicle Number',
-            Value: Assignedslots.vehicleNumber
-        },
-        {
-            Label: 'Assignedslots Name',
-            Value: Assignedslots.driverName
-        },
-        {
-            Label: 'Phone Number',
-            Value: Assignedslots.phoneNumber
-        },
-        {
-            Label: 'In Time',
-            Value: Assignedslots.inTime
-        },
-        {
-            Label: 'Out Time',
-            Value: Assignedslots.outTime
-        },
-        {
-            Label: 'Transport Type',
-            Value: Assignedslots.trasnporTtype
-        }
+    FieldGroup #generalinformation: {
+        $Type: 'UI.FieldGroupType',
+        Data : [
+            {
+                Label: 'Parking Lot Number',
+                Value: parkingLotNumber
+            },
+            {
+                Label: 'Status',
+                Value: status
+            },
         ]
     },
 });
-
-annotate CatalogService.ParkingLot with @(
-    UI.Facets: [
+ 
+ 
+annotate CatalogService.AssignedLots with @(
+    UI.FieldGroup #AssignedLots: {Data: [
+        {
+        Value: parkinglot_parkingLotNumber,
+        Label: 'parkingLotNumber'
+    },
     {
-        $Type : 'UI.ReferenceFacet',
-        ID    : 'GeneralInformationFacet',
-        Label : 'General Information',
-        Target: '@UI.FieldGroup'
+        Value: driverName,
+        Label: 'Driver Name'
+    },
+    {
+        Value: phoneNumber,
+        Label: 'Phone Number'
+    },
+    {
+        Value: inTime,
+        Label: 'Check-in Time'
+    },
+    {
+        Value: outTime,
+        Label: 'Check-out Time'
+    },
+    {
+        Value: trasnporTtype,
+        Label: 'Transport Type'
     }
-]);
+]});
+ 
+annotate CatalogService.ParkingLot with @(UI.Facets: [{
+    $Type : 'UI.ReferenceFacet',
+    ID    : 'GeneralInformationFacet',
+    Label : 'General Information',
+    Target: 'Assignedslots/@UI.FieldGroup#AssignedLots'
+}]);
+ 

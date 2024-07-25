@@ -6,7 +6,7 @@ using {cuid} from '@sap/cds/common';
 entity ParkingLot {
   key parkingLotNumber : String;
       status           : String;
-      @UI.Hidden Assignedslots    : Association to AssignedLots;
+      Assignedslots    : Association to AssignedLots;
 }
 
 entity AssignedLots : cuid {

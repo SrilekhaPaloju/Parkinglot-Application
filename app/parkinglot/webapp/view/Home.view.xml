@@ -39,7 +39,6 @@
                     
                     </BadgeCustomData>
                     </customData>
-                    
                     </Button>
                 </f:actions>
             </f:DynamicPageTitle>
@@ -139,7 +138,6 @@
                                 />
                             </Menu>
                         </MenuButton>
-        
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns >
@@ -225,7 +223,7 @@
                         vAlign="Middle"
                     >
                         <cells>
-                            <VBox>
+                            <VBox id="idvboxparkinglot">
                                 <Text
                                     id="idparkingLotNumberColValue"
                                     text="{parkinglot/parkingLotNumber}"
@@ -233,7 +231,7 @@
                                 <ComboBox
                                     id="parkingLotSelectComboBox"
                                     selectedKey="{parkinglot_parkingLotNumber}"
-                                    items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'EQ', value1: 'Available'}], parameters:{$count:true}, templateShareable:true }"
+                                    items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'NE', value1: 'Occupied'}], parameters:{$count:true}, templateShareable:true }"
                                     visible="false"
                                 >
                                     <core:Item
@@ -243,7 +241,7 @@
                                     />
                                 </ComboBox>
                             </VBox>
-                            <VBox>
+                            <VBox id="idvboxdrivername">
                                 <Text
                                     id="iddriveNameColValue"
                                     text="{driverName}"
@@ -254,7 +252,7 @@
                                     visible="false"
                                 />
                             </VBox>
-                            <VBox>
+                            <VBox id="idvboxphoneno">
                                 <Text
                                     id="idphoneNumberColValue"
                                     text="{phoneNumber}"
@@ -265,7 +263,7 @@
                                     visible="false"
                                 />
                             </VBox>
-                            <VBox>
+                            <VBox id="idvboxvehicleno">
                                 <Text
                                     id="idvehicleNumberColValue"
                                     text="{vehicleNumber}"
@@ -276,7 +274,7 @@
                                     visible="false"
                                 />
                             </VBox>
-                            <VBox>
+                            <VBox id="idvboxtransporttype">
                                 <Text
                                     id="idtrasnporTtypeColValue"
                                     text="{trasnporTtype}"
@@ -287,7 +285,7 @@
                                     visible="false"
                                 />
                             </VBox>
-                            <VBox>
+                            <VBox id="idvboxinTime">
                                 <Text
                                     id="idinTimeColValue"
                                     text="{inTime}"

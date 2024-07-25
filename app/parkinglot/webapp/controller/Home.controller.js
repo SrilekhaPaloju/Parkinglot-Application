@@ -6,6 +6,7 @@ sap.ui.define([
   "use strict";
 
   return Controller.extend("com.app.parkinglot.controller.Home", {
+    isEditMode: false,
     onInit: function () {
       const oTable = this.getView().byId("idSlotsTable");
       oTable.attachBrowserEvent("dblclick", this.onRowDoubleClick.bind(this));
@@ -138,22 +139,25 @@ sap.ui.define([
         return; // Prevent further execution
       }
 
-      const oModel = this.getView().getModel("ModelV2");
-      const oParkingLotData = await oModel.read("/ParkingLot('" + sParkingLotNumber + "')");
-
-      if (oParkingLotData.status === "Occupied") {
-        MessageBox.error("The selected parking lot is already occupied. Please select a different parking lot.");
-        return; // Prevent further execution
-      }
       else {
+        const oModel = this.getView().getModel("ModelV2");
+
+        var bVehicleExists = await this.checkVehicleExists(oModel, sVehicleNumber);
+
+        if (bVehicleExists) {
+            sap.m.MessageBox.error("The vehicle is already assigned to a parking lot.");
+            return; // Prevent further execution
+        }
+
         this.getView().setModel(parkingModel, "parkingModel");
         const oPayload = this.getView().getModel("parkingModel").getProperty("/");
+        
        var create = this.createData(oModel, oPayload, "/AssignedLots");
         if (create) {
           
             // Replace with your actual Twilio Account SID and Auth Token
             const accountSid = 'ACb224f5ef242a9b70012285792ef40e8a';
-            const authToken = '7dfb18571a99989245c76f9c1d316162';
+            const authToken = '2d769f5c7998ae5c3ba5d44d21b82064';
                var to = "+91"+ sPhoneNumber;
             // Function to send SMS using Twili
                 debugger
@@ -188,7 +192,6 @@ sap.ui.define([
                         sap.m.MessageToast.show('SMS sent successfully!');
                     },
                     error: function (xhr, status, error) {
-                        console.error('Error sending SMS:', error);
                         // Handle error, e.g., show an error message
                         sap.m.MessageToast.show('Failed to send SMS: ' + error);
                     }
@@ -223,6 +226,23 @@ sap.ui.define([
         });
       }
     },
+    checkVehicleExists: function(oModel, sVehicleNumber) {
+      return new Promise(function(resolve, reject) {
+          oModel.read("/AssignedLots", {
+              filters: [new sap.ui.model.Filter("vehicleNumber", sap.ui.model.FilterOperator.EQ, sVehicleNumber)],
+              success: function(oData) {
+                  if (oData.results && oData.results.length > 0) {
+                      resolve(true);
+                  } else {
+                      resolve(false);
+                  }
+              },
+              error: function(oError) {
+                  reject(oError);
+              }
+          });
+      });
+  },
     onUnassignlotPress: async function () {
       const oView = this.getView();
       var oSelected = this.byId("idSlotsTable").getSelectedItem();
@@ -293,6 +313,8 @@ sap.ui.define([
     },
 
     onEdit: function () {
+
+      const oView = this.getView()
       var oTable = this.byId("idSlotsTable");
       var aSelectedItems = oTable.getSelectedItems();
 
@@ -301,18 +323,54 @@ sap.ui.define([
         return;
       }
 
-      aSelectedItems.forEach(function (oItem) {
+        aSelectedItems.forEach(function (oItem) {
         var aCells = oItem.getCells();
         aCells.forEach(function (oCell) {
-          var aVBoxItems = oCell.getItems();
-          aVBoxItems[0].setVisible(false); // Hide Text
-          aVBoxItems[1].setVisible(true); // Show Input
+            var aVBoxItems = oCell.getItems();
+            if (aVBoxItems.length > 1) {
+                // Store the original values in a custom data attribute
+                aVBoxItems[1].data("originalValue", aVBoxItems[1].getValue());
+
+                aVBoxItems[0].setVisible(false); // Hide Text
+                aVBoxItems[1].setVisible(true); // Show Input
+            }
         });
-      });
+    });
+      this.isEditMode = true;
       this.byId("editButton").setVisible(false);
       this.byId("saveButton").setVisible(true);
       this.byId("cancelButton").setVisible(true);
+
+      this.refreshComboBox();
     },
+
+    onSelectSlot: function (oEvent) {
+      var oSelectedItem = oEvent.getParameter("listItem");
+      var oTable = this.byId("idSlotsTable");
+  
+      // Reset all items to show text and hide input
+      if (this.isEditMode) {
+        // Reset all items to show text and hide input
+        oTable.getItems().forEach(function (oItem) {
+            var aCells = oItem.getCells();
+            aCells.forEach(function (oCell) {
+                var aVBoxItems = oCell.getItems();
+                aVBoxItems[0].setVisible(true);  // Show Text
+                aVBoxItems[1].setVisible(false); // Hide Input
+            });
+        });
+
+        // If an item is selected, switch to edit mode for that item
+        if (oSelectedItem) {
+            var aCells = oSelectedItem.getCells();
+            aCells.forEach(function (oCell) {
+                var aVBoxItems = oCell.getItems();
+                aVBoxItems[0].setVisible(false); // Hide Text
+                aVBoxItems[1].setVisible(true);  // Show Input
+            });
+        }
+    }
+},
 
     onSave: function () {
       const oView = this.getView()
@@ -329,6 +387,18 @@ sap.ui.define([
         var sDriverMobile = oContext.phoneNumber;
         var dID = oContext.ID;
         var sOldSlotNumber = oContext.parkinglot.parkingLotNumber;
+
+
+        if (!sDriverName || !sDriverName.trim()) {
+          sap.m.MessageBox.error("Driver name cannot be empty.");
+          return; // Stop execution if validation fails
+      }
+
+        // Transport type validation: Should be either "inward" or "outward"
+        if (sTypeofDelivery !== "Inward" && sTypeofDelivery !== "Outward") {
+            sap.m.MessageBox.error("Invalid transport type. It should be either 'inward' or 'outward'.");
+            return; // Stop execution if validation fails
+        }
 
         var phoneNumberPattern = /^\d{10}$/; // Example pattern: exactly 10 digits
         if (!phoneNumberPattern.test(sDriverMobile)) {
@@ -368,10 +438,12 @@ sap.ui.define([
           // Assuming your update method is provided by your OData V2 model
           oDataModel.update("/AssignedLots(" + oPayload.ID + ")", oPayload, {
             success: function () {
+              MessageToast.show("Details updated successfully");
               const updatedParkingLot = {
                 status: "Occupied" // Assuming false represents empty parking
                 // Add other properties if needed
               };
+              if (sSlotNumber !== sOldSlotNumber) {
               oDataModel.update("/ParkingLot('" + sSlotNumber + "')", updatedParkingLot, {
                 success: function () {
                   const updatedParkingLotNumber = {
@@ -383,14 +455,7 @@ sap.ui.define([
                     success: function () {
                       oModel.refresh();
                       oTable.getBinding("items").refresh();
-                        sap.m.MessageBox.success("Slot updated successfully");
-                        var oAssignedSlotsDropdown = oView.byId("parkingLotSelectComboBox"); // Replace with the actual ID of the dropdown in the fragment
-                        if (oAssignedSlotsDropdown) {
-                            var oAssignedSlotsDropdownBinding = oAssignedSlotsDropdown.getBinding("items");
-                            if (oAssignedSlotsDropdownBinding) {
-                                oAssignedSlotsDropdownBinding.refresh();
-                            }
-                        }
+                        MessageToast.show("Slot updated successfully");
 
                         // Refresh the combobox in the table (if applicable)
                         var oParkingLotSelect = oView.byId("parkingLotSelect"); // Replace with the actual ID of the combobox
@@ -410,6 +475,7 @@ sap.ui.define([
                     sap.m.MessageBox.error("Failed to update old slot: " + oError.message);
                   }
                 });
+              }
               },
               error: function (oError) {
                 sap.m.MessageBox.error("Failed to update the slot: " + oError.message);
@@ -417,7 +483,7 @@ sap.ui.define([
             });
      
           }
-            
+        this.refreshComboBox();
       aSelectedItems.forEach(function (oItem) {
         var aCells = oItem.getCells();
         aCells.forEach(function (oCell) {
@@ -426,10 +492,22 @@ sap.ui.define([
           aVBoxItems[1].setVisible(false); // Show Input
         });
       });
+      this.isEditMode = false;
       this.byId("editButton").setVisible(true);
       this.byId("saveButton").setVisible(false);
       this.byId("cancelButton").setVisible(false);
     },
+    refreshComboBox: function () {
+    var oTable = this.byId("idSlotsTable");
+    var aItems = oTable.getItems();
+    
+    aItems.forEach(function (oItem) {
+        var oComboBox = oItem.getCells()[0].getItems()[1]; // Assuming the ComboBox is the second item in the first cell
+        if (oComboBox && oComboBox.getBinding("items")) {
+            oComboBox.getBinding("items").refresh(); // Refresh the ComboBox items binding
+        }
+    });
+},
     onCancel: function () {
       var oTable = this.byId("idSlotsTable");
       var aSelectedItems = oTable.getSelectedItems();
@@ -437,11 +515,19 @@ sap.ui.define([
       aSelectedItems.forEach(function (oItem) {
         var aCells = oItem.getCells();
         aCells.forEach(function (oCell) {
-          var aVBoxItems = oCell.getItems();
-          aVBoxItems[0].setVisible(true); // Show Text
-          aVBoxItems[1].setVisible(false); // Hide Input
+            var aVBoxItems = oCell.getItems();
+            if (aVBoxItems.length > 1) {
+                // Retrieve the original values from the custom data attribute
+                var originalValue = aVBoxItems[1].data("originalValue");
+                if (originalValue !== undefined) {
+                    aVBoxItems[1].setValue(originalValue);
+                }
+                aVBoxItems[0].setVisible(true);  // Show Text
+                aVBoxItems[1].setVisible(false); // Hide Input
+            }
         });
-      });
+    });
+      this.isEditMode = false;
       this.byId("editButton").setVisible(true);
       this.byId("saveButton").setVisible(false);
       this.byId("cancelButton").setVisible(false);
@@ -488,7 +574,7 @@ sap.ui.define([
       const oView = this.getView();
       var oSelected = this.byId("idReserveSlotsTable").getSelectedItem();
       if (!oSelected) {
-        sap.m.MessageToast.show("Please select a vehicle to unassign");
+        sap.m.MessageToast.show("Please select a vehicle to assign");
         return;
       }
 
@@ -560,6 +646,7 @@ sap.ui.define([
       }
       this._pPopover.then(function (oPopover) {
           oPopover.openBy(oButton);
+          this.getView().byId("idReserveSlotsTable").getBinding("items").refresh();
       });
   },
   onItemClose1:function(oEvent){
