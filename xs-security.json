@@ -6,6 +6,10 @@
     {
       "name": "uaa.user",
       "description": "UAA"
+    },
+    {
+      "name": "$XSAPPNAME.Admin",
+      "description": "Admin Scope"
     }
   ],
   "role-templates": [
@@ -15,6 +19,20 @@
       "scope-references": [
         "uaa.user"
       ]
+    },
+    {
+      "name": "Admin",
+      "description": "Admin Role Template",
+      "scope-references": [
+        "$XSAPPNAME.Admin"
+      ]
     }
-  ]
+  ],
+  "role-collections": [
+    {
+      "name": "RCEmployeeCAPAdmin",
+      "description": "Admin Can Create, Update, Delete The Data",
+      "role-template-references": ["$XSAPPNAME.Admin"]
+    }
+  ]  
 }

@@ -3,92 +3,94 @@ ID: Parking-Application
 description: A simple CAP project.
 version: 1.0.0
 modules:
-  - name: Parking-Application-srv
-    type: nodejs
-    path: gen/srv
-    provides:
-      - name: srv-api
-        properties:
-          srv-url: ${default-url}
-    parameters:
-      buildpack: nodejs_buildpack
-      readiness-health-check-http-endpoint: /health
-      readiness-health-check-type: http
-    build-parameters:
-      builder: npm
-    requires:
-      - name: Parking-Application-db
-  - name: Parking-Application-destination-content
-    type: com.sap.application.content
-    requires:
-      - name: Parking-Application-destination-service
-        parameters:
-          content-target: true
-      - name: Parking-Application_html_repo_host
-        parameters:
-          service-key:
-            name: Parking-Application_html_repo_host-key
-      - name: uaa_Parking-Application
-        parameters:
-          service-key:
-            name: uaa_Parking-Application-key
-    parameters:
-      content:
-        instance:
-          destinations:
-            - Name: ParkinglotApprouter_Parking_Application_html_repo_host
-              ServiceInstanceName: Parking-Application-html5-app-host-service
-              ServiceKeyName: Parking-Application_html_repo_host-key
-              sap.cloud.service: ParkinglotApprouter
-            - Authentication: OAuth2UserTokenExchange
-              Name: ParkinglotApprouter_uaa_Parking_Application
-              ServiceInstanceName: Parking-Application-xsuaa-service
-              ServiceKeyName: uaa_Parking-Application-key
-              sap.cloud.service: ParkinglotApprouter
-          existing_destinations_policy: ignore
-    build-parameters:
-      no-source: true
-
-  - name: Parking-Application-db-deployer
-    type: hdb
-    path: gen/db
-    parameters:
-      buildpack: nodejs_buildpack
-    requires:
-      - name: Parking-Application-db
-resources:
-  - name: Parking-Application-destination-service
-    type: org.cloudfoundry.managed-service
-    parameters:
-      config:
-        HTML5Runtime_enabled: true
-        version: 1.0.0
-      service: destination
-      service-name: Parking-Application-destination-service
-      service-plan: lite
-  - name: Parking-Application_html_repo_host
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: html5-apps-repo
-      service-name: Parking-Application-html5-app-host-service
-      service-plan: app-host
-  - name: uaa_Parking-Application
-    type: org.cloudfoundry.managed-service
-    parameters:
-      path: ./xs-security.json
-      service: xsuaa
-      service-name: Parking-Application-xsuaa-service
-      service-plan: application
+- name: Parking-Application-srv
+  type: nodejs
+  path: gen/srv
+  requires:
   - name: Parking-Application-db
-    type: com.sap.xs.hdi-container
+  - name: Parking-Application-auth
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}
+  parameters:
+    buildpack: nodejs_buildpack
+    readiness-health-check-http-endpoint: /health
+    readiness-health-check-type: http
+  build-parameters:
+    builder: npm
+- name: Parking-Application-db-deployer
+  type: hdb
+  path: gen/db
+  requires:
+  - name: Parking-Application-db
+  parameters:
+    buildpack: nodejs_buildpack
+- name: Parking-Application-destination-content
+  type: com.sap.application.content
+  requires:
+  - name: Parking-Application-destination-service
     parameters:
-      service: hana
-      service-plan: hdi-shared
+      content-target: true
+  - name: Parking-Application_html_repo_host
+    parameters:
+      service-key:
+        name: Parking-Application_html_repo_host-key
+  - name: Parking-Application-auth
+    parameters:
+      service-key:
+        name: Parking-Application-auth-key
+  parameters:
+    content:
+      instance:
+        destinations:
+        - Name: parkingapprouter_Parking_Application_html_repo_host
+          ServiceInstanceName: Parking-Application-html5-app-host-service
+          ServiceKeyName: Parking-Application_html_repo_host-key
+          sap.cloud.service: parkingapprouter
+        - Authentication: OAuth2UserTokenExchange
+          Name: parkingapprouter_Parking_Application_auth
+          ServiceInstanceName: Parking-Application-auth
+          ServiceKeyName: Parking-Application-auth-key
+          sap.cloud.service: parkingapprouter
+        existing_destinations_policy: ignore
+  build-parameters:
+    no-source: true
+resources:
+- name: Parking-Application-db
+  type: com.sap.xs.hdi-container
+  parameters:
+    service: hana
+    service-plan: hdi-shared
+- name: Parking-Application-auth
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      tenant-mode: dedicated
+      xsappname: Parking-Application-${org}-${space}
+    path: ./xs-security.json
+    service: xsuaa
+    service-plan: application
+- name: Parking-Application-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      version: 1.0.0
+    service: destination
+    service-name: Parking-Application-destination-service
+    service-plan: lite
+- name: Parking-Application_html_repo_host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: Parking-Application-html5-app-host-service
+    service-plan: app-host
 parameters:
   enable-parallel-deployments: true
 build-parameters:
   before-all:
-    - builder: custom
-      commands:
-        - npm ci
-        - npx cds build --production
+  - builder: custom
+    commands:
+    - npm ci
+    - npx cds build --production
