@@ -1,5 +1,6 @@
 using CatalogService from '../../srv/cat-service';
 
+
 annotate CatalogService.ParkingLot with @(UI: {
     SelectionFields               : [
         parkingLotNumber,
@@ -84,4 +85,6 @@ annotate CatalogService.ParkingLot with @(UI.Facets: [{
     Label : 'General Information',
     Target: 'Assignedslots/@UI.FieldGroup#AssignedLots'
 }]);
+
+
  

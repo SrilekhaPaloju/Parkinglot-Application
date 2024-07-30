@@ -10,7 +10,7 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-.body {
+.body1 {
     background-color: #a4e6e9ea; /* Light green */
     background-image: linear-gradient(to bottom, #92e8edea, #a5e5a7); /* Gradient to even lighter green */
     color: #333333; /* Dark text for contrast */
@@ -26,3 +26,17 @@
     overflow: auto; /* Optional: Add this to handle overflow content */
    
 }
+.bold{
+    font-weight: bold;
+}
+.body {
+    background-color: #ffecd2; /* Soft peach */
+    background-image: linear-gradient(to bottom, #ffecd2, #fcb69f); /* Gradient to a vibrant orange */
+    color: #333333; /* Dark text for contrast */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+}
+
+
+
+
+

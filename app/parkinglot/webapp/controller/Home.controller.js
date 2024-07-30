@@ -2,7 +2,9 @@ sap.ui.define([
   "./BaseController",
   "sap/m/MessageToast",
   "sap/ui/model/json/JSONModel",
-], function (Controller, MessageToast, JSONModel) {
+  "sap/ui/model/Filter",
+  "sap/ui/model/FilterOperator",
+], function (Controller, MessageToast, JSONModel,Filter, FilterOperator) {
   "use strict";
 
   return Controller.extend("com.app.parkinglot.controller.Home", {
@@ -21,7 +23,7 @@ sap.ui.define([
         ParkingLotId: ID,
 
       })
-     },
+    },
     onCreatelotPress: async function () {
       if (!this.oAssignedslotDialog) {
         this.oAssignedslotDialog = await this.loadFragment("Allocation")
@@ -73,7 +75,7 @@ sap.ui.define([
         this.oReservedslotDialog.close()
       }
     },
- 
+
     // onDatavisualization: function () {
     //   const oRouter = this.getRouter();
     //   oRouter.navTo("RouteData")
@@ -114,7 +116,7 @@ sap.ui.define([
       } else {
         oUserView.byId("_IDPhnnoInput2").setValueState("None");
       }
-      if (!sVehicleNumber || !/^[A-Za-z]{2}\d{2}[A-Za-z]{2}\d{4}$/.test(sVehicleNumber)) {
+      if (!sVehicleNumber || !/^[A-Z]{2}\d{2}[A-Z]{2}\d{4}$/.test(sVehicleNumber)) {
         oUserView.byId("_IDGenInput2").setValueState("Error");
         oUserView.byId("_IDGenInput2").setValueStateText("Vehicle number should follow this pattern AP12BG1234");
         bValid = false;
@@ -145,57 +147,57 @@ sap.ui.define([
         var bVehicleExists = await this.checkVehicleExists(oModel, sVehicleNumber);
 
         if (bVehicleExists) {
-            sap.m.MessageBox.error("The vehicle is already assigned to a parking lot.");
-            return; // Prevent further execution
+          sap.m.MessageBox.error("The vehicle is already assigned to a parking lot.");
+          return; // Prevent further execution
         }
 
         this.getView().setModel(parkingModel, "parkingModel");
         const oPayload = this.getView().getModel("parkingModel").getProperty("/");
-        
-       var create = this.createData(oModel, oPayload, "/AssignedLots");
+
+        var create = this.createData(oModel, oPayload, "/AssignedLots");
         if (create) {
-          
-            // Replace with your actual Twilio Account SID and Auth Token
-            const accountSid = 'ACb224f5ef242a9b70012285792ef40e8a';
-            const authToken = '2d769f5c7998ae5c3ba5d44d21b82064';
-               var to = "+91"+ sPhoneNumber;
-            // Function to send SMS using Twili
-                debugger
-                const toNumber = to ; // Replace with recipient's phone number
-                const fromNumber = '+18149043908'; // Replace with your Twilio phone number
-                const messageBody = 'Hello ' + sDriverName + ',\n' +
-                'Your vehicle (' + sVehicleNumber + ') has been assigned to parking lot ' + sParkingLotNumber + '.\n' +
-                'Please park your vehicle in the assigned slot.\n' +
-                'Thank you,\n'
 
-                // Twilio API endpoint for sending messages
-                const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+          // Replace with your actual Twilio Account SID and Auth Token
+          const accountSid = 'ACb224f5ef242a9b70012285792ef40e8a';
+          const authToken = '7de68c20065bdd889187858ae659eab5';
+          var to = "+91" + sPhoneNumber;
+          // Function to send SMS using Twili
+          debugger
+          const toNumber = to; // Replace with recipient's phone number
+          const fromNumber = '+18149043908'; // Replace with your Twilio phone number
+          const messageBody = 'Hello ' + sDriverName + ',\n' +
+            'Your vehicle (' + sVehicleNumber + ') has been assigned to parking lot ' + sParkingLotNumber + '.\n' +
+            'Please park your vehicle in the assigned slot.\n' +
+            'Thank you,\n'
 
-                // Payload for the POST request
-                const payload = {
-                    To: toNumber,
-                    From: fromNumber,
-                    Body: messageBody
-                };
+          // Twilio API endpoint for sending messages
+          const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
 
-                // Send POST request to Twilio API using jQuery.ajax
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    headers: {
-                        'Authorization': 'Basic ' + btoa(accountSid + ':' + authToken)
-                    },
-                    data: payload,
-                    success: function (data) {
-                        console.log('SMS sent successfully:', data);
-                        // Handle success, e.g., show a success message
-                        sap.m.MessageToast.show('SMS sent successfully!');
-                    },
-                    error: function (xhr, status, error) {
-                        // Handle error, e.g., show an error message
-                        sap.m.MessageToast.show('Failed to send SMS: ' + error);
-                    }
-                });
+          // Payload for the POST request
+          const payload = {
+            To: toNumber,
+            From: fromNumber,
+            Body: messageBody
+          };
+
+          // Send POST request to Twilio API using jQuery.ajax
+          $.ajax({
+            url: url,
+            type: 'POST',
+            headers: {
+              'Authorization': 'Basic ' + btoa(accountSid + ':' + authToken)
+            },
+            data: payload,
+            success: function (data) {
+              console.log('SMS sent successfully:', data);
+              // Handle success, e.g., show a success message
+              sap.m.MessageToast.show('SMS sent successfully!');
+            },
+            error: function (xhr, status, error) {
+              // Handle error, e.g., show an error message
+              sap.m.MessageToast.show('Failed to send SMS: ' + error);
+            }
+          });
         }
 
         this.oAssignedslotDialog.close();
@@ -212,6 +214,7 @@ sap.ui.define([
             this.getView().byId("idSlotsTable").getBinding("items").refresh();
             this.getView().byId("parkingLotSelect").getBinding("items").refresh();
             this._setParkingLotModel();
+            this.triggerPrintForm(oPayload);
 
             // Reset the input fields
             oUserView.byId("parkingLotSelect").setSelectedKey("");
@@ -226,23 +229,58 @@ sap.ui.define([
         });
       }
     },
-    checkVehicleExists: function(oModel, sVehicleNumber) {
-      return new Promise(function(resolve, reject) {
-          oModel.read("/AssignedLots", {
-              filters: [new sap.ui.model.Filter("vehicleNumber", sap.ui.model.FilterOperator.EQ, sVehicleNumber)],
-              success: function(oData) {
-                  if (oData.results && oData.results.length > 0) {
-                      resolve(true);
-                  } else {
-                      resolve(false);
-                  }
-              },
-              error: function(oError) {
-                  reject(oError);
-              }
-          });
+    checkVehicleExists: function (oModel, sVehicleNumber) {
+      return new Promise(function (resolve, reject) {
+        oModel.read("/AssignedLots", {
+          filters: [new sap.ui.model.Filter("vehicleNumber", sap.ui.model.FilterOperator.EQ, sVehicleNumber)],
+          success: function (oData) {
+            if (oData.results && oData.results.length > 0) {
+              resolve(true);
+            } else {
+              resolve(false);
+            }
+          },
+          error: function (oError) {
+            reject(oError);
+          }
+        });
       });
-  },
+    },
+  triggerPrintForm:async function (assignedLot) {
+    // Create a temporary print area
+    var printWindow = window.open('', '', 'height=500,width=800');
+    printWindow.document.write('<html><head><title>Parking Lot Allocation</title>');
+    printWindow.document.write('<style>body{font-family: Arial, sans-serif;} table{width: 100%; border-collapse: collapse;} td, th{border: 1px solid #ddd; padding: 8px;} th{padding-top: 12px; padding-bottom: 12px; text-align: left; background-color: #4CAF50; color: white;}</style>');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write('<h2>Parking Lot Allocation</h2>');
+    printWindow.document.write('<table><tr><th>Field</th><th>Value</th></tr>');
+    printWindow.document.write('<tr><td>Vehicle Number</td><td>' + assignedLot.vehicleNumber + '</td></tr>');
+    printWindow.document.write('<tr><td>Driver Name</td><td>' + assignedLot.driverName + '</td></tr>');
+    printWindow.document.write('<tr><td>Phone</td><td>' + assignedLot.phoneNumber + '</td></tr>');
+    printWindow.document.write('<tr><td>Vehicle Type</td><td>' + assignedLot.trasnporTtype + '</td></tr>');
+    printWindow.document.write('<tr><td>Plot Number</td><td>' + assignedLot.parkinglot.parkingLotNumber + '</td></tr>');
+    printWindow.document.write('<tr><td>Assigned Date</td><td>' + assignedLot.inTime + '</td></tr>');
+  
+    // Generate barcode
+    const barcodeValue = `${assignedLot.vehicleNumber}`;
+    const canvas = document.createElement('canvas');
+    await JsBarcode(canvas, barcodeValue, {
+      format: "CODE128",
+      lineColor: "#000000", // Set barcode color to black
+      width: 2,
+      height: 60,
+      displayValue: true
+    });
+    const barcodeImage = canvas.toDataURL("image/png");
+  
+    // Add barcode to print
+    printWindow.document.write('<tr><td>Barcode</td><td><img src="' + barcodeImage + '" alt="Barcode"></td></tr>');
+    printWindow.document.write('</table>');
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.print();
+  },  
+
     onUnassignlotPress: async function () {
       const oView = this.getView();
       var oSelected = this.byId("idSlotsTable").getSelectedItem();
@@ -287,9 +325,15 @@ sap.ui.define([
           oSelected.getBindingContext().delete("$auto").then(function () {
             MessageToast.show("Unassigned successfully");
             this.getView().byId("idSlotsTable").getBinding("items").refresh();
+            const oHistorySlotsTable = this.getView().byId("idHistorySlotsTable");
+            if (oHistorySlotsTable) {
+              oHistorySlotsTable.getBinding("items").refresh();
+            }
+            const oParkingLotSelect = this.getView().byId("parkingLotSelect");
+            if (oParkingLotSelect) {
+              oParkingLotSelect.getBinding("items").refresh();
+            }
             this._setParkingLotModel();
-            this.getView().byId("idHistorySlotsTable").getBinding("items").refresh();
-            this.getView().byId("parkingLotSelect").getBinding("items").refresh(); // Refresh parking lot select
 
           }.bind(this));
 
@@ -313,8 +357,6 @@ sap.ui.define([
     },
 
     onEdit: function () {
-
-      const oView = this.getView()
       var oTable = this.byId("idSlotsTable");
       var aSelectedItems = oTable.getSelectedItems();
 
@@ -323,19 +365,19 @@ sap.ui.define([
         return;
       }
 
-        aSelectedItems.forEach(function (oItem) {
+      aSelectedItems.forEach(function (oItem) {
         var aCells = oItem.getCells();
         aCells.forEach(function (oCell) {
-            var aVBoxItems = oCell.getItems();
-            if (aVBoxItems.length > 1) {
-                // Store the original values in a custom data attribute
-                aVBoxItems[1].data("originalValue", aVBoxItems[1].getValue());
+          var aVBoxItems = oCell.getItems();
+          if (aVBoxItems.length > 1) {
+            // Store the original values in a custom data attribute
+            aVBoxItems[1].data("originalValue", aVBoxItems[1].getValue());
 
-                aVBoxItems[0].setVisible(false); // Hide Text
-                aVBoxItems[1].setVisible(true); // Show Input
-            }
+            aVBoxItems[0].setVisible(false); // Hide Text
+            aVBoxItems[1].setVisible(true); // Show Input
+          }
         });
-    });
+      });
       this.isEditMode = true;
       this.byId("editButton").setVisible(false);
       this.byId("saveButton").setVisible(true);
@@ -347,30 +389,30 @@ sap.ui.define([
     onSelectSlot: function (oEvent) {
       var oSelectedItem = oEvent.getParameter("listItem");
       var oTable = this.byId("idSlotsTable");
-  
+
       // Reset all items to show text and hide input
       if (this.isEditMode) {
         // Reset all items to show text and hide input
         oTable.getItems().forEach(function (oItem) {
-            var aCells = oItem.getCells();
-            aCells.forEach(function (oCell) {
-                var aVBoxItems = oCell.getItems();
-                aVBoxItems[0].setVisible(true);  // Show Text
-                aVBoxItems[1].setVisible(false); // Hide Input
-            });
+          var aCells = oItem.getCells();
+          aCells.forEach(function (oCell) {
+            var aVBoxItems = oCell.getItems();
+            aVBoxItems[0].setVisible(true);  // Show Text
+            aVBoxItems[1].setVisible(false); // Hide Input
+          });
         });
 
         // If an item is selected, switch to edit mode for that item
         if (oSelectedItem) {
-            var aCells = oSelectedItem.getCells();
-            aCells.forEach(function (oCell) {
-                var aVBoxItems = oCell.getItems();
-                aVBoxItems[0].setVisible(false); // Hide Text
-                aVBoxItems[1].setVisible(true);  // Show Input
-            });
+          var aCells = oSelectedItem.getCells();
+          aCells.forEach(function (oCell) {
+            var aVBoxItems = oCell.getItems();
+            aVBoxItems[0].setVisible(false); // Hide Text
+            aVBoxItems[1].setVisible(true);  // Show Input
+          });
         }
-    }
-},
+      }
+    },
 
     onSave: function () {
       const oView = this.getView()
@@ -392,12 +434,12 @@ sap.ui.define([
         if (!sDriverName || !sDriverName.trim()) {
           sap.m.MessageBox.error("Driver name cannot be empty.");
           return; // Stop execution if validation fails
-      }
+        }
 
         // Transport type validation: Should be either "inward" or "outward"
         if (sTypeofDelivery !== "Inward" && sTypeofDelivery !== "Outward") {
-            sap.m.MessageBox.error("Invalid transport type. It should be either 'inward' or 'outward'.");
-            return; // Stop execution if validation fails
+          sap.m.MessageBox.error("Invalid transport type. It should be either 'inward' or 'outward'.");
+          return; // Stop execution if validation fails
         }
 
         var phoneNumberPattern = /^\d{10}$/; // Example pattern: exactly 10 digits
@@ -405,7 +447,7 @@ sap.ui.define([
           sap.m.MessageBox.error("Invalid phone number. It should be exactly 10 digits.");
           return; // Stop execution if validation fails
         }
-    
+
         var vehicleNumberPattern = /^[A-Z]{2}\d{2}[A-Z]{2}\d{4}$/; // Pattern: 2 letters, 2 digits, 2 letters, 4 digits
         if (!vehicleNumberPattern.test(sVehicle)) {
           sap.m.MessageBox.error("Invalid vehicle number. It should be in the format AP12BG1234.");
@@ -433,57 +475,56 @@ sap.ui.define([
 
         var oPayload = this.getView().getModel("oNewUpdate").getData();
         var oDataModel = this.getOwnerComponent().getModel("ModelV2");// Assuming this is your OData V2 model
-        
 
-          // Assuming your update method is provided by your OData V2 model
-          oDataModel.update("/AssignedLots(" + oPayload.ID + ")", oPayload, {
-            success: function () {
-              MessageToast.show("Details updated successfully");
-              const updatedParkingLot = {
-                status: "Occupied" // Assuming false represents empty parking
-                // Add other properties if needed
-              };
-              if (sSlotNumber !== sOldSlotNumber) {
+
+        // Assuming your update method is provided by your OData V2 model
+        oDataModel.update("/AssignedLots(" + oPayload.ID + ")", oPayload, {
+          success: function () {
+            MessageToast.show("Details updated successfully");
+            const updatedParkingLot = {
+              status: "Occupied" // Assuming false represents empty parking
+              // Add other properties if needed
+            };
+            if (sSlotNumber !== sOldSlotNumber) {
               oDataModel.update("/ParkingLot('" + sSlotNumber + "')", updatedParkingLot, {
                 success: function () {
                   const updatedParkingLotNumber = {
                     status: "Available" // Assuming false represents empty parking
                     // Add other properties if needed
-                    
+
                   };
                   oDataModel.update("/ParkingLot('" + sOldSlotNumber + "')", updatedParkingLotNumber, {
                     success: function () {
                       oModel.refresh();
                       oTable.getBinding("items").refresh();
-                        MessageToast.show("Slot updated successfully");
+                      MessageToast.show("Slot updated successfully");
 
-                        // Refresh the combobox in the table (if applicable)
-                        var oParkingLotSelect = oView.byId("parkingLotSelect"); // Replace with the actual ID of the combobox
-                        if (oParkingLotSelect) {
-                            var oParkingLotSelectBinding = oParkingLotSelect.getBinding("items");
-                            if (oParkingLotSelectBinding) {
-                                oParkingLotSelectBinding.refresh();
-                            }
+                      // Refresh the combobox in the table (if applicable)
+                      var oParkingLotSelect = oView.byId("parkingLotSelect"); // Replace with the actual ID of the combobox
+                      if (oParkingLotSelect) {
+                        var oParkingLotSelectBinding = oParkingLotSelect.getBinding("items");
+                        if (oParkingLotSelectBinding) {
+                          oParkingLotSelectBinding.refresh();
                         }
-                      },
-                      error: function (oError) {
-                        sap.m.MessageBox.error("Failed to update new slot: " + oError.message);
                       }
-                    });
-                  },
-                  error: function (oError) {
-                    sap.m.MessageBox.error("Failed to update old slot: " + oError.message);
-                  }
-                });
-              }
-              },
-              error: function (oError) {
-                sap.m.MessageBox.error("Failed to update the slot: " + oError.message);
-              }
-            });
-     
+                    },
+                    error: function (oError) {
+                      sap.m.MessageBox.error("Failed to update new slot: " + oError.message);
+                    }
+                  });
+                },
+                error: function (oError) {
+                  sap.m.MessageBox.error("Failed to update old slot: " + oError.message);
+                }
+              });
+            }
+          },
+          error: function (oError) {
+            sap.m.MessageBox.error("Failed to update the slot: " + oError.message);
           }
-        this.refreshComboBox();
+        });
+      }
+      this.refreshComboBox();
       aSelectedItems.forEach(function (oItem) {
         var aCells = oItem.getCells();
         aCells.forEach(function (oCell) {
@@ -498,16 +539,16 @@ sap.ui.define([
       this.byId("cancelButton").setVisible(false);
     },
     refreshComboBox: function () {
-    var oTable = this.byId("idSlotsTable");
-    var aItems = oTable.getItems();
-    
-    aItems.forEach(function (oItem) {
+      var oTable = this.byId("idSlotsTable");
+      var aItems = oTable.getItems();
+
+      aItems.forEach(function (oItem) {
         var oComboBox = oItem.getCells()[0].getItems()[1]; // Assuming the ComboBox is the second item in the first cell
         if (oComboBox && oComboBox.getBinding("items")) {
-            oComboBox.getBinding("items").refresh(); // Refresh the ComboBox items binding
+          oComboBox.getBinding("items").refresh(); // Refresh the ComboBox items binding
         }
-    });
-},
+      });
+    },
     onCancel: function () {
       var oTable = this.byId("idSlotsTable");
       var aSelectedItems = oTable.getSelectedItems();
@@ -515,18 +556,18 @@ sap.ui.define([
       aSelectedItems.forEach(function (oItem) {
         var aCells = oItem.getCells();
         aCells.forEach(function (oCell) {
-            var aVBoxItems = oCell.getItems();
-            if (aVBoxItems.length > 1) {
-                // Retrieve the original values from the custom data attribute
-                var originalValue = aVBoxItems[1].data("originalValue");
-                if (originalValue !== undefined) {
-                    aVBoxItems[1].setValue(originalValue);
-                }
-                aVBoxItems[0].setVisible(true);  // Show Text
-                aVBoxItems[1].setVisible(false); // Hide Input
+          var aVBoxItems = oCell.getItems();
+          if (aVBoxItems.length > 1) {
+            // Retrieve the original values from the custom data attribute
+            var originalValue = aVBoxItems[1].data("originalValue");
+            if (originalValue !== undefined) {
+              aVBoxItems[1].setValue(originalValue);
             }
+            aVBoxItems[0].setVisible(true);  // Show Text
+            aVBoxItems[1].setVisible(false); // Hide Input
+          }
         });
-    });
+      });
       this.isEditMode = false;
       this.byId("editButton").setVisible(true);
       this.byId("saveButton").setVisible(false);
@@ -570,7 +611,7 @@ sap.ui.define([
         }
       });
     },
-    onAssignDialog: async function(){
+    onAssignDialog: async function () {
       const oView = this.getView();
       var oSelected = this.byId("idReserveSlotsTable").getSelectedItem();
       if (!oSelected) {
@@ -623,7 +664,7 @@ sap.ui.define([
 
           var oParkingLotSelect = this.byId("parkingLotSelect");
           if (oParkingLotSelect) {
-              oParkingLotSelect.getBinding("items").refresh();
+            oParkingLotSelect.getBinding("items").refresh();
           }
 
         } catch (error) {
@@ -634,29 +675,60 @@ sap.ui.define([
     },
     onNotificationPress: function (oEvent) {
       var oButton = oEvent.getSource(),
-          oView = this.getView();
+        oView = this.getView();
 
       // create popover
       if (!this._pPopover) {
-          this._pPopover = this.loadFragment("Notification").then(function (oPopover) {
-              oView.addDependent(oPopover);
-              oPopover.bindElement("");
-              return oPopover;
-          });
+        this._pPopover = this.loadFragment("Notification").then(function (oPopover) {
+          oView.addDependent(oPopover);
+          oPopover.bindElement("");
+          return oPopover;
+        });
       }
       this._pPopover.then(function (oPopover) {
-          oPopover.openBy(oButton);
-          this.getView().byId("idReserveSlotsTable").getBinding("items").refresh();
+        oPopover.openBy(oButton);
+        this.getView().byId("idReserveSlotsTable").getBinding("items").refresh();
       });
+    },
+    onItemClose1: function (oEvent) {
+      var oItem = oEvent.getSource(),
+        oList = oItem.getParent();
+
+      oList.removeItem(oItem);
+      MessageToast.show("Item Closed: " + oItem.getTitle());
+    },
+    onToggleSearch: function () {
+      var oSearchField = this.byId("searchField");
+      var bVisible = oSearchField.getVisible();
+      oSearchField.setVisible(!bVisible);
   },
-  onItemClose1:function(oEvent){
-    var oItem = oEvent.getSource(),
-    oList = oItem.getParent();
-
-  oList.removeItem(oItem);
-  MessageToast.show("Item Closed: " + oItem.getTitle());
-
-  }
+            onSearch: function (oEvent) {
+                var sQuery = oEvent.getParameter("query");
+                var sSearchFieldId = oEvent.getSource().getId();
+                var oTable, aFilters = [];
+ 
+                if (sSearchFieldId.includes("searchField")) {
+                    oTable = this.byId("idSlotsTable");
+                    if (sQuery) {
+                        var aStringFilters = [
+                            new Filter("parkinglot/parkingLotNumber", FilterOperator.Contains, sQuery),
+                            new Filter("driverName", FilterOperator.Contains, sQuery),
+                            new Filter("phoneNumber", FilterOperator.Contains, sQuery),
+                            new Filter("vehicleNumber", FilterOperator.Contains, sQuery),
+                            new Filter("trasnporTtype", FilterOperator.Contains, sQuery)
+                        ];
+                        aFilters.push(new Filter({ filters: aStringFilters, and: false }));
+                    }
+                } 
+                if (oTable) {
+                    var oBinding = oTable.getBinding("items");
+                    if (oBinding) {
+                        oBinding.filter(aFilters);
+                    } else {
+                        console.error("Binding not found for the table with ID: " + sSearchFieldId);
+                }
+            }
+      },
   });
 });
 

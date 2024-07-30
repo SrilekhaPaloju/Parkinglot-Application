@@ -1,5 +1,5 @@
 parkingLotNumber,status,Assignedslots_ID
-PL001,Occupied,
+PL001,Available,
 PL002,Available,
 PL003,Available,
 PL004,Reserved,

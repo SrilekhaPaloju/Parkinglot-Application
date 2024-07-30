@@ -12,7 +12,10 @@
         headerExpanded="true"
     >
         <f:title>
-            <f:DynamicPageTitle id="idSlotsListPageTitle" class="title">
+            <f:DynamicPageTitle
+                id="idSlotsListPageTitle"
+                class="title"
+            >
                 <f:heading>
                     <Title
                         id="idSlotsPageHeadingTitle"
@@ -25,25 +28,23 @@
                         text="{i18n>SubTitle}"
                     />
                 </f:expandedContent>
-                 <f:actions>
+                <f:actions>
                     <Button
                         icon="sap-icon://bell"
                         press="onNotificationPress"
                         type="Transparent"
                     >
-                    <customData>
-                    <BadgeCustomData 
-                     value="{/Reservations/$count}"
-                            visible="true" >
-                    
-                    
-                    </BadgeCustomData>
-                    </customData>
+                        <customData>
+                            <BadgeCustomData
+                                value="{/Reservations/$count}"
+                                visible="true"
+                            />
+                        </customData>
                     </Button>
                 </f:actions>
             </f:DynamicPageTitle>
         </f:title>
-        <f:content >
+        <f:content>
             <Table
                 id="idSlotsTable"
                 growing="true"
@@ -61,12 +62,22 @@
                             text="Assigned Slots: {/AssignedLots/$count}"
                         />
                         <ToolbarSpacer id="idTableHeaderSpacer" />
-                        <!-- <Button
-                            id="dataButton"
-                            text="DataVisualization"
+                        <Button
+                            icon="sap-icon://search"
+                            press="onToggleSearch"
                             type="Transparent"
-                            press="onDatavisualization"
-                        /> -->
+                            tooltip="Search"
+                            id="searchButton"
+                        />
+                        <SearchField
+                            id="searchField"
+                            search="onSearch"
+                            liveChange="handlerSearchFieldLiveEvent"
+                            visible="false"
+                            showSearchButton="true"
+                            placeholder="Search..."
+                            width="15rem"
+                        />
                         <Button
                             id="idBtnCreate"
                             icon="sap-icon://shipping-status"
@@ -81,7 +92,7 @@
                             press="onEdit"
                             icon="sap-icon://edit"
                         />
-                         <Button
+                        <Button
                             id="saveButton"
                             text="Save"
                             type="Transparent"
@@ -92,7 +103,7 @@
                         <Button
                             id="cancelButton"
                             text="Cancel"
-                            type="Transparent"
+                            type="Reject"
                             press="onCancel"
                             visible="false"
                             icon="sap-icon://decline"
@@ -103,20 +114,11 @@
                             press="onUnassignlotPress"
                             text="Unassign"
                         />
-                        <!-- <Button
-                            id="idBtnHistory"
-                            type="Default"
-                            press="onHistorylotPress"
-                            text="History"
-                            icon="sap-icon://customer-history"
-                        /> -->
-                         <MenuButton
+                        <MenuButton
                             id="idMenuButton"
                             text="More"
                         >
-                            <Menu
-                                id="idActionsMenu"
-                            >
+                            <Menu id="idActionsMenu">
                                 <MenuItem
                                     id="idMenuItemHistory"
                                     text="History"
@@ -134,13 +136,12 @@
                                     text="Reserved slots"
                                     icon="sap-icon://time-entry-request"
                                     press="onReservation"
-                                    
                                 />
                             </Menu>
                         </MenuButton>
                     </OverflowToolbar>
                 </headerToolbar>
-                <columns >
+                <columns>
                     <Column
                         id="idParkingLotNoCol"
                         width="12em"
@@ -231,7 +232,7 @@
                                 <ComboBox
                                     id="parkingLotSelectComboBox"
                                     selectedKey="{parkinglot_parkingLotNumber}"
-                                    items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'NE', value1: 'Occupied'}], parameters:{$count:true}, templateShareable:true }"
+                                    items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'EQ', value1: 'Available'}], parameters:{$count:true}, templateShareable:true }"
                                     visible="false"
                                 >
                                     <core:Item
@@ -275,9 +276,14 @@
                                 />
                             </VBox>
                             <VBox id="idvboxtransporttype">
-                                <Text
+                                <!-- <Text
                                     id="idtrasnporTtypeColValue"
                                     text="{trasnporTtype}"
+                                /> -->
+                                <ObjectStatus
+                                    class = "bold"
+                                    state="{= ${trasnporTtype} === 'Inward' ? 'Success' : 'Warning'}"
+                                    text="{= ${trasnporTtype} === 'Inward' ? 'Inward' : 'Outward'}"
                                 />
                                 <Input
                                     id="idtransportInput"
