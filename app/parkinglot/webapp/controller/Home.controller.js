@@ -1,11 +1,27 @@
+function formatDateToEdmDateTimeOffset(date) {
+  const pad = (n) => (n < 10 ? '0' + n : n);
+
+  const year = date.getUTCFullYear();
+  const month = pad(date.getUTCMonth() + 1);
+  const day = pad(date.getUTCDate());
+  const hours = pad(date.getUTCHours());
+  const minutes = pad(date.getUTCMinutes());
+  const seconds = pad(date.getUTCSeconds());
+
+  // Format with timezone offset as 'Z' for UTC
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000Z`;
+}
 sap.ui.define([
   "./BaseController",
   "sap/m/MessageToast",
   "sap/ui/model/json/JSONModel",
   "sap/ui/model/Filter",
   "sap/ui/model/FilterOperator",
-], function (Controller, MessageToast, JSONModel,Filter, FilterOperator) {
+  "sap/ui/core/Element",
+], function (Controller, MessageToast, JSONModel, Filter, FilterOperator, Element) {
   "use strict";
+  var prefixId;
+  var oScanResultText;
 
   return Controller.extend("com.app.parkinglot.controller.Home", {
     isEditMode: false,
@@ -13,6 +29,12 @@ sap.ui.define([
       const oTable = this.getView().byId("idSlotsTable");
       oTable.attachBrowserEvent("dblclick", this.onRowDoubleClick.bind(this));
       this._setParkingLotModel();
+      if (prefixId) {
+        prefixId = prefixId.split("--")[0] + "--";
+      } else {
+        prefixId = "";
+      }
+      oScanResultText = Element.getElementById(prefixId + 'sampleBarcodeScannerResult');
     },
 
     onRowDoubleClick: function () {
@@ -214,7 +236,7 @@ sap.ui.define([
             this.getView().byId("idSlotsTable").getBinding("items").refresh();
             this.getView().byId("parkingLotSelect").getBinding("items").refresh();
             this._setParkingLotModel();
-            this.triggerPrintForm(oPayload);
+            this.printAssignmentDetails(oPayload)
 
             // Reset the input fields
             oUserView.byId("parkingLotSelect").setSelectedKey("");
@@ -246,40 +268,7 @@ sap.ui.define([
         });
       });
     },
-  triggerPrintForm:async function (assignedLot) {
-    // Create a temporary print area
-    var printWindow = window.open('', '', 'height=500,width=800');
-    printWindow.document.write('<html><head><title>Parking Lot Allocation</title>');
-    printWindow.document.write('<style>body{font-family: Arial, sans-serif;} table{width: 100%; border-collapse: collapse;} td, th{border: 1px solid #ddd; padding: 8px;} th{padding-top: 12px; padding-bottom: 12px; text-align: left; background-color: #4CAF50; color: white;}</style>');
-    printWindow.document.write('</head><body>');
-    printWindow.document.write('<h2>Parking Lot Allocation</h2>');
-    printWindow.document.write('<table><tr><th>Field</th><th>Value</th></tr>');
-    printWindow.document.write('<tr><td>Vehicle Number</td><td>' + assignedLot.vehicleNumber + '</td></tr>');
-    printWindow.document.write('<tr><td>Driver Name</td><td>' + assignedLot.driverName + '</td></tr>');
-    printWindow.document.write('<tr><td>Phone</td><td>' + assignedLot.phoneNumber + '</td></tr>');
-    printWindow.document.write('<tr><td>Vehicle Type</td><td>' + assignedLot.trasnporTtype + '</td></tr>');
-    printWindow.document.write('<tr><td>Plot Number</td><td>' + assignedLot.parkinglot.parkingLotNumber + '</td></tr>');
-    printWindow.document.write('<tr><td>Assigned Date</td><td>' + assignedLot.inTime + '</td></tr>');
-  
-    // Generate barcode
-    const barcodeValue = `${assignedLot.vehicleNumber}`;
-    const canvas = document.createElement('canvas');
-    await JsBarcode(canvas, barcodeValue, {
-      format: "CODE128",
-      lineColor: "#000000", // Set barcode color to black
-      width: 2,
-      height: 60,
-      displayValue: true
-    });
-    const barcodeImage = canvas.toDataURL("image/png");
-  
-    // Add barcode to print
-    printWindow.document.write('<tr><td>Barcode</td><td><img src="' + barcodeImage + '" alt="Barcode"></td></tr>');
-    printWindow.document.write('</table>');
-    printWindow.document.write('</body></html>');
-    printWindow.document.close();
-    printWindow.print();
-  },  
+
 
     onUnassignlotPress: async function () {
       const oView = this.getView();
@@ -701,34 +690,252 @@ sap.ui.define([
       var oSearchField = this.byId("searchField");
       var bVisible = oSearchField.getVisible();
       oSearchField.setVisible(!bVisible);
-  },
-            onSearch: function (oEvent) {
-                var sQuery = oEvent.getParameter("query");
-                var sSearchFieldId = oEvent.getSource().getId();
-                var oTable, aFilters = [];
- 
-                if (sSearchFieldId.includes("searchField")) {
-                    oTable = this.byId("idSlotsTable");
-                    if (sQuery) {
-                        var aStringFilters = [
-                            new Filter("parkinglot/parkingLotNumber", FilterOperator.Contains, sQuery),
-                            new Filter("driverName", FilterOperator.Contains, sQuery),
-                            new Filter("phoneNumber", FilterOperator.Contains, sQuery),
-                            new Filter("vehicleNumber", FilterOperator.Contains, sQuery),
-                            new Filter("trasnporTtype", FilterOperator.Contains, sQuery)
-                        ];
-                        aFilters.push(new Filter({ filters: aStringFilters, and: false }));
-                    }
-                } 
-                if (oTable) {
-                    var oBinding = oTable.getBinding("items");
-                    if (oBinding) {
-                        oBinding.filter(aFilters);
-                    } else {
-                        console.error("Binding not found for the table with ID: " + sSearchFieldId);
-                }
+      this.byId("searchButton").setVisible(false);
+
+    },
+    onSearch: function () {
+      // Get the search field and toggle button by their IDs
+      var oSearchField = this.byId("searchField");
+      var oToggleSearchButton = this.byId("toggleSearchButton");
+
+      // Hide the search field
+      oSearchField.setVisible(false);
+      this.byId("searchButton").setVisible(true);
+
+      // Toggle the visibility of the button
+      var bVisible = oToggleSearchButton.getVisible();
+      oToggleSearchButton.setVisible(!bVisible);
+
+    },
+
+    handlerSearchFieldLiveEvent: function (oEvent) {
+      var sQuery = oEvent.getParameter("newValue");
+      var aFilters = [];
+
+      if (sQuery && sQuery.length > 0) {
+        aFilters.push(new Filter("parkinglot/parkingLotNumber", FilterOperator.Contains, sQuery));
+        aFilters.push(new Filter("driverName", FilterOperator.Contains, sQuery));
+        aFilters.push(new Filter("phoneNumber", FilterOperator.Contains, sQuery));
+        aFilters.push(new Filter("vehicleNumber", FilterOperator.Contains, sQuery));
+        aFilters.push(new Filter("trasnporTtype", FilterOperator.Contains, sQuery));
+
+        var oFinalFilter = new Filter({
+          filters: aFilters,
+          and: false
+        });
+
+        this.getView().byId("idSlotsTable").getBinding("items").filter(oFinalFilter);
+      } else {
+        this.getView().byId("idSlotsTable").getBinding("items").filter([]);
+      }
+    },
+    printAssignmentDetails: function (oPayload) {
+      // Generate barcode data
+      var barcodeData = `${oPayload.vehicleNumber}`;
+
+      // Create a new window for printing
+      var printWindow = window.open('', '', 'height=600,width=800');
+
+      printWindow.document.write('<html><head><title>Print Assigned Details</title>');
+      printWindow.document.write('<style>');
+      printWindow.document.write('body { font-family: Arial, sans-serif; }');
+      printWindow.document.write('.details-table { width: 100%; border-collapse: collapse; }');
+      printWindow.document.write('.details-table th, .details-table td { border: 1px solid #000; padding: 8px; text-align: left; }');
+      printWindow.document.write('.details-table th { background-color: #f2f2f2; color: #333; }'); // Header background and text color
+      printWindow.document.write('.details-table td { color: #555; }'); // Details cell text color
+      printWindow.document.write('.field-cell { background-color: #e0f7fa; color: #00796b; }'); // Field cell background and text color
+      printWindow.document.write('.details-cell { background-color: #fffde7; color: #f57f17; }'); // Details cell background and text color
+      printWindow.document.write('</style>');
+      printWindow.document.write('</head><body>');
+      printWindow.document.write('<div class="print-container">');
+      printWindow.document.write('<h1>Parking-slot Details</h1>');
+      printWindow.document.write('</div>');
+
+      printWindow.document.write('<table class="details-table">');
+      printWindow.document.write('<tr><th>Field</th><th>Details</th></tr>');
+      printWindow.document.write('<tr><td class="field-cell">Vehicle Number</td><td class="details-cell">' + oPayload.vehicleNumber + '</td></tr>');
+      printWindow.document.write('<tr><td class="field-cell">Driver Name</td><td class="details-cell">' + oPayload.driverName + '</td></tr>');
+      printWindow.document.write('<tr><td class="field-cell">Phone Number</td><td class="details-cell">' + oPayload.phoneNumber + '</td></tr>');
+      printWindow.document.write('<tr><td class="field-cell">Transport Type</td><td class="details-cell">' + oPayload.trasnporTtype + '</td></tr>');
+      printWindow.document.write('<tr><td class="field-cell">Parkingslot Number</td><td class="details-cell"><div class="barcode-container"><svg id="barcode"></svg></div></td></tr>');
+      printWindow.document.write('</table>');
+
+      // Include JsBarcode library
+      printWindow.document.write('<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>');
+      printWindow.document.write('<script>JsBarcode("#barcode", "' + barcodeData + '");</script>');
+
+      printWindow.document.write('</div>');
+      printWindow.document.write('</body></html>');
+
+      printWindow.document.close();
+      printWindow.focus();
+
+      // Print the contents of the new window
+      printWindow.print();
+    },
+    onScanSuccessOne: function (oEvent) {
+      // Get the scanned barcode data from the event
+      var sBarcode = oEvent.getParameter("text");
+
+      // Update the input field with the scanned barcode
+      var oInput = this.byId("_IDGenInput2");
+      oInput.setValue(sBarcode);
+
+      var sVehicleNumber = oEvent.getParameter("text");
+
+      // Assuming your model is named 'parkingModel'
+      var oModel = this.getView().getModel("ModelV2");
+
+      // Construct the filter to fetch data based on the vehicle number
+      var aFilters = [
+        new sap.ui.model.Filter("vehicleNumber", sap.ui.model.FilterOperator.EQ, sVehicleNumber)
+      ];
+      var that = this;
+      // Perform a read operation on the AssignedLots entity
+      oModel.read("/AssignedLots", {
+        filters: aFilters,
+        success: function (oData) {
+          if (oData.results && oData.results.length > 0) {
+            var oAssignedLot = oData.results[0]; // Assume first match is correct
+            console.log(oAssignedLot)
+
+            // Populate form fields   
+            this.byId("parkingLotSelect").setVisible(false);
+            this.byId("idparkingLotNumberCol").setVisible(true);
+            that.byId("idparkingLotNumberCol").setValue(oAssignedLot.parkinglot_parkingLotNumber);
+            that.byId("_IDDriverInput2").setValue(oAssignedLot.driverName);
+            that.byId("_IDPhnnoInput2").setValue(oAssignedLot.phoneNumber);
+            that.byId("country").setSelectedKey(oAssignedLot.trasnporTtype);
+            that.byId("idIntime").setValue(oAssignedLot.inTime);
+            that.byId("idID").setValue(oAssignedLot.ID);
+
+
+          } else {
+            // Handle case where no matching data is found
+            sap.m.MessageToast.show("No data found for the scanned vehicle number.");
+          }
+        }.bind(this),
+        error: function (oError) {
+          sap.m.MessageToast.show("Error fetching data.");
+          console.error(oError);
+        }
+      });
+    },
+    onScanErrorOne: function (oEvent) {
+      // Handle the scan error
+      var sErrorMessage = oEvent.getParameter("message");
+
+      // Optionally, display a message toast to show the error
+      sap.m.MessageToast.show("Scan failed: " + sErrorMessage);
+    },
+
+    onScanLiveUpdate: function (oEvent) {
+      // This function can be used if you want to handle live updates during scanning
+      var sLiveValue = oEvent.getParameter("value");
+
+      // For now, you might not need this, but you can log the live value
+      console.log("Live scan value: " + sLiveValue);
+    },
+
+    onUnassignPress: function () {
+      const oView = this.getView();
+      var sSlotNumber = this.byId("idparkingLotNumberCol").getValue();
+      var sVehicle = this.byId("_IDGenInput2").getValue();
+      var sDriverName = this.byId("_IDDriverInput2").getValue();
+      var sDriverMobile = this.byId("_IDPhnnoInput2").getValue();
+      var sTypeofDelivery = this.byId("country").getSelectedKey();
+      // var sID = this.byId("idID").getValue();
+      var currentDate = new Date();
+
+      const dCheckInTimeString = this.byId("idIntime").getValue();
+      const dCheckInTime = new Date(dCheckInTimeString);
+      if (isNaN(dCheckInTime.getTime())) {
+        console.error("Invalid check-in time");
+        sap.m.MessageToast.show("Invalid check-in time");
+        return;
+      }
+      const formattedCheckInTime = formatDateToEdmDateTimeOffset(dCheckInTime);
+      const formattedCheckOutTime = formatDateToEdmDateTimeOffset(currentDate);
+
+      const oNewHistory = new sap.ui.model.json.JSONModel({
+        driverName: sDriverName,
+        driverMobile: sDriverMobile,
+        vehicleNumber: sVehicle,
+        deliveryType: sTypeofDelivery,
+        checkInTime: formattedCheckInTime,
+        historySlotNumber_parkingLotNumber: sSlotNumber,
+        checkOutTime: formattedCheckOutTime
+      });
+      oView.setModel(oNewHistory, "oNewHistory");
+
+      // var oParkingslot = new sap.ui.model.json.JSONModel({
+      //   parkingLotNumber: sSlotNumber,
+      //   status: oStatus
+      // });
+      // oView.setModel(oParkingslot, "oParkingslot");
+
+      try {
+        const oModel = this.getView().getModel("ModelV2");
+        // Create history record
+        const oPayload = oView.getModel("oNewHistory").getProperty("/");
+        this.createData(oModel, oPayload, "/History");
+        // Fetch the entry to find the cuid
+        oModel.read("/AssignedLots", {
+          filters: [new sap.ui.model.Filter("vehicleNumber", sap.ui.model.FilterOperator.EQ, sVehicle)],
+          success: function (oData) {
+            if (oData.results.length > 0) {
+              const sCuid = oData.results[0].ID; // Assuming 'ID' is the cuid field
+
+              // Remove the vehicle entry from AssignedLots
+              const sPath = "/AssignedLots(" + sCuid + ")";
+              oModel.remove(sPath, {
+                success: function () {
+                  console.log("Vehicle removed from AssignedLots successfully");
+
+                  MessageToast.show("Unassigned successfully");
+                  oView.byId("idSlotsTable").getBinding("items").refresh();
+                  const oHistorySlotsTable = oView.byId("idHistorySlotsTable");
+                  if (oHistorySlotsTable) {
+                    oHistorySlotsTable.getBinding("items").refresh();
+                  }
+                  this._setParkingLotModel();
+
+                  const updatedParkingLot = {
+                    status: "Available"
+                  };
+                  oModel.update("/ParkingLot('" + sSlotNumber + "')", updatedParkingLot, {
+                    success: function () {
+                        this.getView().byId("parkingLotSelect").getBinding("items").refresh();
+                    }.bind(this),
+                    error: function (oError) {
+                      sap.m.MessageBox.error("Failed to update: " + oError.message);
+                    }.bind(this)
+                  });
+                }.bind(this),
+                error: function (oError) {
+                  sap.m.MessageBox.error("Failed to remove vehicle: " + oError.message);
+                }.bind(this)
+              });
+            } else {
+              sap.m.MessageToast.show("No entry found for the given vehicle number");
             }
-      },
+          }.bind(this),
+          error: function (oError) {
+            sap.m.MessageBox.error("Error fetching entry: " + oError.message);
+          }
+        });
+      } catch (error) {
+        console.error("Error:", error);
+        sap.m.MessageToast.show("Failed to unassign vehicle: " + error.message);
+      }
+
+      this.byId("parkingLotSelect").setVisible(true);
+      this.byId("idparkingLotNumberCol").setVisible(false);
+      oView.byId("_IDGenInput2").setValue("");
+      oView.byId("_IDDriverInput2").setValue("");
+      oView.byId("_IDPhnnoInput2").setValue("");
+      oView.byId("country").setSelectedKey("");
+    },
   });
 });
 

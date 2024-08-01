@@ -33,6 +33,7 @@
                         icon="sap-icon://bell"
                         press="onNotificationPress"
                         type="Transparent"
+                        tooltip="Notifications"
                     >
                         <customData>
                             <BadgeCustomData
@@ -84,6 +85,7 @@
                             type="Accept"
                             press="onCreatelotPress"
                             text="ParkingLot Allocation"
+                            
                         />
                         <Button
                             id="editButton"
@@ -310,6 +312,7 @@
                                 <Input
                                     value="{parkinglot/status}"
                                     visible="false"
+                                    enabled="false"
                                 />
                             </VBox>
                         </cells>

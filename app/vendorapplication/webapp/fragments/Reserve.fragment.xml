@@ -9,6 +9,7 @@
         draggable="true"
         contentWidth="30%"
         title="Reserve a slot"
+        class="dialogSlideDown"
     >
         <beginButton>
             <Button

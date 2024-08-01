@@ -7,3 +7,15 @@
     background-position: center;  
     background-position: center;
 }
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+    }
+ 
+    to {
+        transform: translateY(0);
+    }
+}
+.dialogSlideDown {
+    animation: slideDown 0.5s forwards;
+}

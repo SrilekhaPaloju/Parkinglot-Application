@@ -2,6 +2,8 @@
     xmlns:core="sap.ui.core"
     xmlns="sap.m"
     xmlns:form="sap.ui.layout.form"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:ndc="sap.ndc"
 >
     <Dialog
         id="idAssignedslotsDailog"
@@ -9,8 +11,9 @@
         draggable="true"
         contentWidth="30%"
         title="Slot Allocation"
+        class="dialogSlideDown"
     >
-        <beginButton>
+        <!-- <beginButton>
             <Button
                 id="_IDAssignButton"
                 text="Assign"
@@ -19,13 +22,13 @@
             />
         </beginButton>
         <endButton>
-            <Button
-                id="idCancelslot"
-                text="Cancel"
-                press="onCloseCreateDialog"
-                type="Negative"
-            />
-        </endButton>
+                <Button
+                    id="idCancelslot"
+                    text="Cancel"
+                    press="onCloseCreateDialog"
+                    type="Negative"
+                />
+        </endButton> -->
         <content>
             <form:SimpleForm
                 id="SimpleFormToolbar"
@@ -51,7 +54,7 @@
                     id="_IDGenLabel1"
                     text="Parkinglot Number"
                 />
-                <Select
+                <!-- <Select
                     id="parkingLotSelect"
                     selectedKey=""
                     items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'EQ', value1: 'Available'}]}"
@@ -61,24 +64,46 @@
                         key="{parkingLotNumber}"
                         text="{parkingLotNumber}"
                     />
-                </Select>
-			<!-- <ComboBox id="_IDGenComboBox1"
-            selectedKey="{parkingModel>/parkingLotNumber}"
-				 items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'NE', value1: 'Occupied'}]}">
-				<core:Item
-                        id="_IDGenItem3"
-                        key="{parkingLotNumber}"
-                        text="{parkingLotNumber}"
+                </Select> -->
+                <VBox id="idvboxparkingnumber">
+                    <ComboBox
+                        id="parkingLotSelect"
+                        width="50rem"
+                        selectedKey="{parkingModel>/parkingLotNumber}"
+                        items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'NE', value1: 'Occupied'}]}"
+                    >
+                        <core:Item
+                            id="_IDGenItem3"
+                            key="{parkingLotNumber}"
+                            text="{parkingLotNumber}"
+                        />
+                    </ComboBox>
+                    <Input
+                        id="idparkingLotNumberCol"
+                        value=""
+                        visible="false"
                     />
-			</ComboBox> -->
+                </VBox>
+
                 <Label
                     id="_IDGenLabel2"
                     text="Vehicle Number"
                 />
-                <Input
-                    id="_IDGenInput2"
-                    value=""
-                />
+                <HBox>
+                    <Input
+                        id="_IDGenInput2"
+                        value=""
+                        width="25rem"
+                    />
+                    <ndc:BarcodeScannerButton
+                        id="sampleBarcodeScannerButtonZebraOne"
+                        scanSuccess="onScanSuccessOne"
+                        scanFail="onScanErrorOne"
+                        inputLiveUpdate="onScanLiveUpdate"
+                        dialogTitle=""
+                        class="sampleBarcodeScannerButtonWithZebraEB"
+                    />
+                </HBox>
                 <Label
                     id="_IDDriverLabel2"
                     text="Driver Name"
@@ -99,7 +124,7 @@
                     id="_IDGenLabel4"
                     text="Transport type"
                 />
-                <Select
+                <!-- <Select
                     id="country"
                     selectedKey=""
                 >
@@ -115,10 +140,12 @@
                             key="Outward"
                         />
                     </items>
-                </Select>
-                <!-- <ComboBox    id="country"
-                    selectedKey="{parkingModel>/trasnporTtype}">
-				 <items>
+                </Select> -->
+                <ComboBox
+                    id="country"
+                    selectedKey="{parkingModel>/trasnporTtype}"
+                >
+                    <items>
                         <core:Item
                             id="_IDGenItem1"
                             text="Inward"
@@ -130,7 +157,44 @@
                             key="Outward"
                         />
                     </items>
-			</ComboBox> -->
+                </ComboBox>
+                 <Input
+                    id="idIntime"
+                    value=""
+                    visible="false"
+                />
+                <Input
+                    id="idID"
+                    value=""
+                    visible="false"
+                />
+                <Label
+                    text="null"
+                    visible="false"
+                />
+                <HBox
+                    justifyContent="SpaceBetween"
+                    alignItems="Center"
+                >
+                    <Button
+                        id="_IDAssignButton"
+                        text="Assign"
+                        press="onAssignPress"
+                        type="Accept"
+                    />
+                    <Button
+                        id="idUnassignSlot"
+                        text="Unassign"
+                        press="onUnassignPress"
+                        type="Emphasized"
+                    />
+                    <Button
+                        id="idCancelslot"
+                        text="Cancel"
+                        press="onCloseCreateDialog"
+                        type="Negative"
+                    />
+                </HBox>
             </form:SimpleForm>
         </content>
     </Dialog>

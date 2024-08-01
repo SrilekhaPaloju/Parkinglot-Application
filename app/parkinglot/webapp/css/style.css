@@ -35,6 +35,18 @@
     color: #333333; /* Dark text for contrast */
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
 }
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+    }
+ 
+    to {
+        transform: translateY(0);
+    }
+}
+.dialogSlideDown {
+    animation: slideDown 0.5s forwards;
+}
 
 
 
