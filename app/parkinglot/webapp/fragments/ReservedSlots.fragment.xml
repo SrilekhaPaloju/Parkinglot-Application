@@ -11,7 +11,7 @@
         contentHeight="85%"   
     >
      <customHeader>
-            <Bar id="IDGenReserveBar">
+            <Bar id="IDGenReserveBar" class="title">
                  <contentMiddle>
                     <FlexBox
                         id="flexboxReserveHeader"
@@ -88,7 +88,7 @@
                     <Column id="idReserveIntimeCol">
                         <Title
                             id="idReserveIntimecolTitle"
-                            text="Reserved Time"
+                            text="Reserved Date"
                         />
                     </Column>
                 </columns>

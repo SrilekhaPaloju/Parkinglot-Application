@@ -6,6 +6,7 @@ using {cuid} from '@sap/cds/common';
 entity ParkingLot {
   key parkingLotNumber : String;
       status           : String;
+      trasnporTtype    : String;
       Assignedslots    : Association to AssignedLots;
 }
 
@@ -36,7 +37,7 @@ entity History : cuid {
    driverName:String;
    mobileNumber:String;
    processType:String;
-   reserveTime :DateTime;
+   reserveTime :Date;
    parkingslot :Association to ParkingLot;
  }
 

@@ -1,2 +1,2 @@
 ID,vendorName,vehicleNumber,driverName,mobileNumber,processType,reserveTime,parkingslot_parkingLotNumber
-dcb16d95-7d34-4381-a6e2-0ef1b16e44c9,Vendor A,ABC123,John Doe,1234567890,Inward,2024-07-17T08:00:00Z,PL004
+dcb16d95-7d34-4381-a6e2-0ef1b16e44c9,Vendor A,ABC123,John Doe,1234567890,Inward,2024-07-17,PL004

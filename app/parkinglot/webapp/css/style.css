@@ -5,9 +5,9 @@
     margin-left: 2rem;
 }
 .title {
-    background-color: #09c8f5;
-    background-image: linear-gradient(to bottom, #09c8f5, #ffffff);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    background-color: #09c8f5 !important;
+    background-image: linear-gradient(to bottom, #09c8f5, #ffffff) !important;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
 }
 
 .body1 {
@@ -30,10 +30,10 @@
     font-weight: bold;
 }
 .body {
-    background-color: #ffecd2; /* Soft peach */
-    background-image: linear-gradient(to bottom, #ffecd2, #fcb69f); /* Gradient to a vibrant orange */
-    color: #333333; /* Dark text for contrast */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+    background-color: #ffecd2 !important; /* Soft peach */
+    background-image: linear-gradient(to bottom, #ffecd2, #fcb69f) !important; /* Gradient to a vibrant orange */
+    color: #333333 !important; /* Dark text for contrast */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important; /* Subtle shadow effect */
 }
 @keyframes slideDown {
     from {
@@ -47,6 +47,7 @@
 .dialogSlideDown {
     animation: slideDown 0.5s forwards;
 }
+
 
 
 

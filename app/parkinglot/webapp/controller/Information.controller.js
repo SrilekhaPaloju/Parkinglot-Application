@@ -1,13 +1,9 @@
 sap.ui.define(
   [
     "./BaseController",
-    "sap/ui/model/json/JSONModel",
-    'sap/ui/model/BindingMode',
-    'sap/viz/ui5/format/ChartFormatter',
-    'sap/viz/ui5/api/env/Format',
     "sap/m/MessageToast"
   ],
-  function (Controller, JSONModel, BindingMode , ChartFormatter, Format, MessageToast) {
+  function (Controller, MessageToast) {
     "use strict";
 
 
@@ -41,7 +37,6 @@ sap.ui.define(
           status: "Occupied" // Assuming false represents empty parking
           // Add other properties if needed
         };
-
         oModel.update("/ParkingLot('" + sParkingLotNumber + "')", updatedParkingLot, {
           success: function () {
           }.bind(this),

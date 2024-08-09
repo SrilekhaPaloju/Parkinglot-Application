@@ -19,14 +19,18 @@
     "@sap/cds-dk": "^7",
     "@sap/eslint-plugin-cds": "^3",
     "@sap/ux-specification": "^1.120.14",
-    "eslint": "^9"
+    "eslint": "^9",
+    "rimraf": "^5.0.5"
   },
   "scripts": {
     "start": "cds-serve",
     "watch-parkinglotfiori": "cds watch --open parkinglotfiori/webapp/index.html?sap-ui-xx-viewCache=false",
     "watch-parkinglot": "cds watch --open parkinglot/webapp/index.html?sap-ui-xx-viewCache=false",
     "watch-pakinglotfiorielemnt": "cds watch --open pakinglotfiorielemnt/webapp/index.html?sap-ui-xx-viewCache=false",
-    "watch-vendorapplication": "cds watch --open vendorapplication/webapp/index.html?sap-ui-xx-viewCache=false"
+    "watch-vendorapplication": "cds watch --open vendorapplication/webapp/index.html?sap-ui-xx-viewCache=false",
+    "undeploy": "cf undeploy Parking-Application --delete-services --delete-service-keys --delete-service-brokers",
+    "build": "rimraf resources mta_archives && mbt build --mtar archive",
+    "deploy": "cf deploy mta_archives/archive.mtar --retries 1"
   },
   "sapux": [
     "app/parkinglotfiori",

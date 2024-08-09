@@ -1,27 +1,11 @@
-function formatDateToEdmDateTimeOffset(date) {
-  const pad = (n) => (n < 10 ? '0' + n : n);
-
-  const year = date.getUTCFullYear();
-  const month = pad(date.getUTCMonth() + 1);
-  const day = pad(date.getUTCDate());
-  const hours = pad(date.getUTCHours());
-  const minutes = pad(date.getUTCMinutes());
-  const seconds = pad(date.getUTCSeconds());
-
-  // Format with timezone offset as 'Z' for UTC
-  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000Z`;
-}
 sap.ui.define([
   "./BaseController",
   "sap/m/MessageToast",
   "sap/ui/model/json/JSONModel",
   "sap/ui/model/Filter",
-  "sap/ui/model/FilterOperator",
-  "sap/ui/core/Element",
-], function (Controller, MessageToast, JSONModel, Filter, FilterOperator, Element) {
+  "sap/ui/model/FilterOperator"
+], function (Controller, MessageToast, JSONModel, Filter, FilterOperator) {
   "use strict";
-  var prefixId;
-  var oScanResultText;
 
   return Controller.extend("com.app.parkinglot.controller.Home", {
     isEditMode: false,
@@ -29,14 +13,11 @@ sap.ui.define([
       const oTable = this.getView().byId("idSlotsTable");
       oTable.attachBrowserEvent("dblclick", this.onRowDoubleClick.bind(this));
       this._setParkingLotModel();
-      if (prefixId) {
-        prefixId = prefixId.split("--")[0] + "--";
-      } else {
-        prefixId = "";
-      }
-      oScanResultText = Element.getElementById(prefixId + 'sampleBarcodeScannerResult');
     },
-
+    onBeforeRendering: function () {
+      debugger
+      this.updateSoltsStatusbyDate();
+    },
     onRowDoubleClick: function () {
       var oSelected = this.byId("idSlotsTable").getSelectedItem();
       var ID = oSelected.getBindingContext().getObject().ID;
@@ -109,7 +90,8 @@ sap.ui.define([
       var sVehicleNumber = this.byId("_IDGenInput2").getValue();
       var sDriverName = this.byId("_IDDriverInput2").getValue();
       var sPhoneNumber = this.byId("_IDPhnnoInput2").getValue();
-      var sTransportType = this.byId("country").getSelectedKey();
+      // Check if "Outbound" is selected; default to "Inbound" otherwise
+      var sTransportType = this.byId("_IDOutboundCheckBox").getSelected() ? "Outward" : "Inward";
 
       const parkingModel = new sap.ui.model.json.JSONModel({
         driverName: sDriverName,
@@ -146,10 +128,10 @@ sap.ui.define([
         oUserView.byId("_IDGenInput2").setValueState("None");
       }
       if (!sTransportType) {
-        oUserView.byId("country").setValueState("Error");
+        oUserView.byId("_IDOutboundCheckBox").setValueState("Error");
         bValid = false;
       } else {
-        oUserView.byId("country").setValueState("None");
+        oUserView.byId("_IDOutboundCheckBox").setValueState("None");
       }
       if (!sParkingLotNumber) {
         oUserView.byId("parkingLotSelect").setValueState("Error");
@@ -237,13 +219,17 @@ sap.ui.define([
             this.getView().byId("parkingLotSelect").getBinding("items").refresh();
             this._setParkingLotModel();
             this.printAssignmentDetails(oPayload)
+            setTimeout(() => {
+              this.updateTableCount(); // Update the count after the table refresh
+            }, 1000); // Increased timeout duration
+            this.updateParkingLotSelect();
 
             // Reset the input fields
             oUserView.byId("parkingLotSelect").setSelectedKey("");
             oUserView.byId("_IDGenInput2").setValue("");
             oUserView.byId("_IDDriverInput2").setValue("");
             oUserView.byId("_IDPhnnoInput2").setValue("");
-            oUserView.byId("country").setSelectedKey("");
+            oUserView.byId("_IDOutboundCheckBox").setSelected(false);
           }.bind(this),
           error: function (oError) {
             sap.m.MessageBox.error("Failed to update: " + oError.message);
@@ -268,7 +254,38 @@ sap.ui.define([
         });
       });
     },
-
+    updateParkingLotSelect: async function () {
+      var oModel = this.getView().getModel("ModelV2");
+     
+      try {
+          var aInboundSlots = await new Promise((resolve, reject) => {
+              oModel.read("/ParkingLot", {
+                  filters: [
+                      new sap.ui.model.Filter("trasnporTtype", sap.ui.model.FilterOperator.EQ, "Inward"),
+                      new sap.ui.model.Filter("status", sap.ui.model.FilterOperator.EQ, "Available")
+                  ],
+                  success: function (oData) {
+                      resolve(oData.results);
+                  },
+                  error: function (oError) {
+                      reject(oError);
+                  }
+              });
+          });
+         
+          var oParkingLotSelect = this.byId("parkingLotSelect");
+          oParkingLotSelect.destroyItems();
+         
+          aInboundSlots.forEach(slot => {
+              oParkingLotSelect.addItem(new sap.ui.core.Item({
+                  key: slot.parkingLotNumber,
+                  text: slot.parkingLotNumber,
+              }));
+          });
+      } catch (error) {
+          sap.m.MessageBox.error("Failed to update parking lot select: " + error.message);
+      }
+  },
 
     onUnassignlotPress: async function () {
       const oView = this.getView();
@@ -323,6 +340,9 @@ sap.ui.define([
               oParkingLotSelect.getBinding("items").refresh();
             }
             this._setParkingLotModel();
+            setTimeout(() => {
+              this.updateTableCount(); // Update the count after the table refresh
+            }, 1000); // Increased timeout duration
 
           }.bind(this));
 
@@ -344,7 +364,17 @@ sap.ui.define([
         }
       }
     },
-
+    updateTableCount: function () {
+      const oTable = this.getView().byId("idSlotsTable");
+      const oBinding = oTable.getBinding("items");
+      if (oBinding) {
+        const iTableCount = oBinding.getLength();
+        this.getView().byId("idTableHeaderTitle").setText(`Assigned Slots: (${iTableCount})`);
+      } else {
+        // Handle the case where the binding is not available
+        console.error("Binding not found for assignedSlotsTable.");
+      }
+    },
     onEdit: function () {
       var oTable = this.byId("idSlotsTable");
       var aSelectedItems = oTable.getSelectedItems();
@@ -362,6 +392,13 @@ sap.ui.define([
             // Store the original values in a custom data attribute
             aVBoxItems[1].data("originalValue", aVBoxItems[1].getValue());
 
+                  // Determine if the current cell is the transport type cell
+                  if (aVBoxItems[0].getId().includes("idvboxtransporttype")) {
+                    var sTransportType = aVBoxItems[0].getText();
+                    // Apply filter to ComboBox based on transport type
+                    this._filterParkingLotComboBox(sTransportType);
+                }
+
             aVBoxItems[0].setVisible(false); // Hide Text
             aVBoxItems[1].setVisible(true); // Show Input
           }
@@ -374,6 +411,20 @@ sap.ui.define([
 
       this.refreshComboBox();
     },
+    _filterParkingLotComboBox: function (sTransportType) {
+      var oComboBox = this.byId("parkingLotSelectComboBox");
+      var oBinding = oComboBox.getBinding("items");
+  
+      // Apply filters to the ComboBox items based on the transport type and availability
+      var aFilters = [
+          new sap.ui.model.Filter("trasnporTtype", sap.ui.model.FilterOperator.EQ, sTransportType),
+          new sap.ui.model.Filter("status", sap.ui.model.FilterOperator.EQ, "Available")
+      ];
+  
+      if (oBinding) {
+          oBinding.filter(aFilters);
+      }
+  },  
 
     onSelectSlot: function (oEvent) {
       var oSelectedItem = oEvent.getParameter("listItem");
@@ -615,7 +666,7 @@ sap.ui.define([
         var sDriverName = oSelectedContext.getProperty("driverName");
         var sTypeofDelivery = oSelectedContext.getProperty("processType");
         var sDriverMobile = oSelectedContext.getProperty("mobileNumber");
-        var dCheckInTime = oSelectedContext.getProperty("reserveTime");
+        //   var dCheckInTime = oSelectedContext.getProperty("reserveTime");
 
         // Create a record in history
         const oNewAssign = new sap.ui.model.json.JSONModel({
@@ -623,7 +674,7 @@ sap.ui.define([
           phoneNumber: sDriverMobile,
           vehicleNumber: sVehicle,
           trasnporTtype: sTypeofDelivery,
-          inTime: dCheckInTime,
+          inTime: new Date(),
           parkinglot_parkingLotNumber: sSlotNumber,
         });
         oView.setModel(oNewAssign, "oNewAssign")
@@ -637,6 +688,9 @@ sap.ui.define([
             this.getView().byId("idSlotsTable").getBinding("items").refresh();
             this._setParkingLotModel();
             this.getView().byId("idReserveSlotsTable").getBinding("items").refresh(); // Refresh parking lot select
+            setTimeout(() => {
+              this.updateTableCount(); // Update the count after the table refresh
+            }, 1000);
           }.bind(this));
 
           const updatedParkingLot = {
@@ -655,7 +709,6 @@ sap.ui.define([
           if (oParkingLotSelect) {
             oParkingLotSelect.getBinding("items").refresh();
           }
-
         } catch (error) {
           console.error("Error:", error);
           sap.m.MessageToast.show("Failed to assign vehicle: " + error.message);
@@ -703,7 +756,7 @@ sap.ui.define([
       this.byId("searchButton").setVisible(true);
 
       // Toggle the visibility of the button
-      var bVisible = oToggleSearchButton.getVisible();
+      // var bVisible = oToggleSearchButton.getVisible();
       oToggleSearchButton.setVisible(!bVisible);
 
     },
@@ -728,50 +781,69 @@ sap.ui.define([
       } else {
         this.getView().byId("idSlotsTable").getBinding("items").filter([]);
       }
-    },
+    },   
     printAssignmentDetails: function (oPayload) {
-      // Generate barcode data
-      var barcodeData = `${oPayload.vehicleNumber}`;
+      // Generate QR code data
+      var qrData = `${oPayload.vehicleNumber}`;
+
+      // Get current date and time
+      var currentDate = new Date().toLocaleDateString();
+      var currentTime = new Date().toLocaleTimeString();
 
       // Create a new window for printing
       var printWindow = window.open('', '', 'height=600,width=800');
+      printWindow.document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>');
 
-      printWindow.document.write('<html><head><title>Print Assigned Details</title>');
-      printWindow.document.write('<style>');
-      printWindow.document.write('body { font-family: Arial, sans-serif; }');
-      printWindow.document.write('.details-table { width: 100%; border-collapse: collapse; }');
-      printWindow.document.write('.details-table th, .details-table td { border: 1px solid #000; padding: 8px; text-align: left; }');
-      printWindow.document.write('.details-table th { background-color: #f2f2f2; color: #333; }'); // Header background and text color
-      printWindow.document.write('.details-table td { color: #555; }'); // Details cell text color
-      printWindow.document.write('.field-cell { background-color: #e0f7fa; color: #00796b; }'); // Field cell background and text color
-      printWindow.document.write('.details-cell { background-color: #fffde7; color: #f57f17; }'); // Details cell background and text color
-      printWindow.document.write('</style>');
-      printWindow.document.write('</head><body>');
-      printWindow.document.write('<div class="print-container">');
-      printWindow.document.write('<h1>Parking-slot Details</h1>');
-      printWindow.document.write('</div>');
+      setTimeout(() => {
+        printWindow.document.write('<html><head><title>Print Assigned Details</title>');
+        printWindow.document.write('<style>');
+        printWindow.document.write('body { font-family: Arial, sans-serif; }');
+        printWindow.document.write('.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }');
+        printWindow.document.write('.date-time { display: flex; flex-direction: column; }');
+        printWindow.document.write('.date-time div { margin-bottom: 5px; }');
+        printWindow.document.write('.details-table { width: 100%; border-collapse: collapse; margin-top: 20px; }');
+        printWindow.document.write('.details-table th, .details-table td { border: 1px solid #000; padding: 8px; text-align: left; }');
+        printWindow.document.write('.details-table th { background-color: #f2f2f2; color: #333; }');
+        printWindow.document.write('.details-table td { color: #555; }');
+        printWindow.document.write('.field-cell { background-color: #e0f7fa; color: #00796b; }');
+        printWindow.document.write('.details-cell { background-color: #fffde7; color: #f57f17; }');
+        printWindow.document.write('.qr-container { text-align: right; }');
+        printWindow.document.write('</style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write('<div class="print-container">');
+        printWindow.document.write('<h1>Parking-slot Details</h1>');
+        printWindow.document.write('<div class="header">');
+        printWindow.document.write('<div class="date-time">');
+        printWindow.document.write('<div><strong>Date:</strong> ' + currentDate + '</div>');
+        printWindow.document.write('<div><strong>Time:</strong> ' + currentTime + '</div>');
+        printWindow.document.write('</div>');
+        printWindow.document.write('<div class="qr-container"><div id="qrcode"></div></div>');
+        printWindow.document.write('</div>');
 
-      printWindow.document.write('<table class="details-table">');
-      printWindow.document.write('<tr><th>Field</th><th>Details</th></tr>');
-      printWindow.document.write('<tr><td class="field-cell">Vehicle Number</td><td class="details-cell">' + oPayload.vehicleNumber + '</td></tr>');
-      printWindow.document.write('<tr><td class="field-cell">Driver Name</td><td class="details-cell">' + oPayload.driverName + '</td></tr>');
-      printWindow.document.write('<tr><td class="field-cell">Phone Number</td><td class="details-cell">' + oPayload.phoneNumber + '</td></tr>');
-      printWindow.document.write('<tr><td class="field-cell">Transport Type</td><td class="details-cell">' + oPayload.trasnporTtype + '</td></tr>');
-      printWindow.document.write('<tr><td class="field-cell">Parkingslot Number</td><td class="details-cell"><div class="barcode-container"><svg id="barcode"></svg></div></td></tr>');
-      printWindow.document.write('</table>');
 
-      // Include JsBarcode library
-      printWindow.document.write('<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>');
-      printWindow.document.write('<script>JsBarcode("#barcode", "' + barcodeData + '");</script>');
+        printWindow.document.write('<table class="details-table">');
+        printWindow.document.write('<tr><th>Field</th><th>Details</th></tr>');
+        printWindow.document.write('<tr><td class="field-cell">Vehicle Number</td><td class="details-cell">' + oPayload.vehicleNumber + '</td></tr>');
+        printWindow.document.write('<tr><td class="field-cell">Driver Name</td><td class="details-cell">' + oPayload.driverName + '</td></tr>');
+        printWindow.document.write('<tr><td class="field-cell">Phone Number</td><td class="details-cell">' + oPayload.phoneNumber + '</td></tr>');
+        printWindow.document.write('<tr><td class="field-cell">Transport Type</td><td class="details-cell">' + oPayload.trasnporTtype + '</td></tr>');
+        printWindow.document.write('<tr><td class="field-cell">Parking Slot Number</td><td class="details-cell">' + oPayload.parkinglot.parkingLotNumber + '</td></tr>');
+        printWindow.document.write('</table>');
 
-      printWindow.document.write('</div>');
-      printWindow.document.write('</body></html>');
+        // Include QRCode library
+        printWindow.document.write('<script>');
+        printWindow.document.write('new QRCode(document.getElementById("qrcode"), { text: "' + qrData + '", width: 100, height: 100 });');
+        printWindow.document.write('</script>');
 
-      printWindow.document.close();
-      printWindow.focus();
+        printWindow.document.write('</div>');
+        printWindow.document.write('</body></html>');
 
-      // Print the contents of the new window
-      printWindow.print();
+        printWindow.document.close();
+        printWindow.focus();
+
+        printWindow.print();
+
+      }, 2000);
     },
     onScanSuccessOne: function (oEvent) {
       // Get the scanned barcode data from the event
@@ -791,6 +863,7 @@ sap.ui.define([
         new sap.ui.model.Filter("vehicleNumber", sap.ui.model.FilterOperator.EQ, sVehicleNumber)
       ];
       var that = this;
+
       // Perform a read operation on the AssignedLots entity
       oModel.read("/AssignedLots", {
         filters: aFilters,
@@ -805,7 +878,12 @@ sap.ui.define([
             that.byId("idparkingLotNumberCol").setValue(oAssignedLot.parkinglot_parkingLotNumber);
             that.byId("_IDDriverInput2").setValue(oAssignedLot.driverName);
             that.byId("_IDPhnnoInput2").setValue(oAssignedLot.phoneNumber);
-            that.byId("country").setSelectedKey(oAssignedLot.trasnporTtype);
+            // Set the checkbox based on the transport type
+            if (oAssignedLot.trasnporTtype === "Outward") {
+              that.byId("_IDOutboundCheckBox").setSelected(true);
+            } else {
+              that.byId("_IDOutboundCheckBox").setSelected(false);
+            }
             that.byId("idIntime").setValue(oAssignedLot.inTime);
             that.byId("idID").setValue(oAssignedLot.ID);
 
@@ -843,7 +921,7 @@ sap.ui.define([
       var sVehicle = this.byId("_IDGenInput2").getValue();
       var sDriverName = this.byId("_IDDriverInput2").getValue();
       var sDriverMobile = this.byId("_IDPhnnoInput2").getValue();
-      var sTypeofDelivery = this.byId("country").getSelectedKey();
+      var sTypeofDelivery = this.byId("_IDOutboundCheckBox").getSelected() ? "Outward" : "Inward";
       // var sID = this.byId("idID").getValue();
       var currentDate = new Date();
 
@@ -854,8 +932,8 @@ sap.ui.define([
         sap.m.MessageToast.show("Invalid check-in time");
         return;
       }
-      const formattedCheckInTime = formatDateToEdmDateTimeOffset(dCheckInTime);
-      const formattedCheckOutTime = formatDateToEdmDateTimeOffset(currentDate);
+      const formattedCheckInTime = this.formatDateToEdmDateTimeOffset(dCheckInTime);
+      const formattedCheckOutTime = this.formatDateToEdmDateTimeOffset(currentDate);
 
       const oNewHistory = new sap.ui.model.json.JSONModel({
         driverName: sDriverName,
@@ -891,7 +969,6 @@ sap.ui.define([
               oModel.remove(sPath, {
                 success: function () {
                   console.log("Vehicle removed from AssignedLots successfully");
-
                   MessageToast.show("Unassigned successfully");
                   oView.byId("idSlotsTable").getBinding("items").refresh();
                   const oHistorySlotsTable = oView.byId("idHistorySlotsTable");
@@ -899,13 +976,17 @@ sap.ui.define([
                     oHistorySlotsTable.getBinding("items").refresh();
                   }
                   this._setParkingLotModel();
+                  this.oAssignedslotDialog.close();
 
                   const updatedParkingLot = {
                     status: "Available"
                   };
                   oModel.update("/ParkingLot('" + sSlotNumber + "')", updatedParkingLot, {
                     success: function () {
-                        this.getView().byId("parkingLotSelect").getBinding("items").refresh();
+                      this.getView().byId("parkingLotSelect").getBinding("items").refresh();
+                      setTimeout(() => {
+                        this.updateTableCount(); // Update the count after the table refresh
+                      }, 1000);
                     }.bind(this),
                     error: function (oError) {
                       sap.m.MessageBox.error("Failed to update: " + oError.message);
@@ -928,13 +1009,142 @@ sap.ui.define([
         console.error("Error:", error);
         sap.m.MessageToast.show("Failed to unassign vehicle: " + error.message);
       }
-
       this.byId("parkingLotSelect").setVisible(true);
       this.byId("idparkingLotNumberCol").setVisible(false);
       oView.byId("_IDGenInput2").setValue("");
       oView.byId("_IDDriverInput2").setValue("");
       oView.byId("_IDPhnnoInput2").setValue("");
-      oView.byId("country").setSelectedKey("");
+      oView.byId("_IDOutboundCheckBox").setSelected(false);
+    },
+     formatDateToEdmDateTimeOffset: function(date) {
+      const pad = (n) => (n < 10 ? '0' + n : n);
+    
+      const year = date.getUTCFullYear();
+      const month = pad(date.getUTCMonth() + 1);
+      const day = pad(date.getUTCDate());
+      const hours = pad(date.getUTCHours());
+      const minutes = pad(date.getUTCMinutes());
+      const seconds = pad(date.getUTCSeconds());
+    
+      // Format with timezone offset as 'Z' for UTC
+      return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000Z`;
+    },
+    updateSoltsStatusbyDate: function () {
+      const oThis = this;
+      let currentDate = new Date();
+      let year = currentDate.getFullYear();
+      let month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      let day = String(currentDate.getDate()).padStart(2, '0');
+      const currentDay = `${year}-${month}-${day}`;
+
+      const oModel = this.getView().getModel("ModelV2");
+
+      if (!oModel) {
+        MessageToast.show("Model is not defined");
+        return;
+      }
+
+      // Read reserved slots
+      oModel.read("/Reservations", {
+        success: function (oData) {
+          if (oData.results.length > 0) {
+            oData.results.forEach((element) => {
+              var oReservedDate = element.reserveTime;
+              if (oReservedDate === currentDay) {
+                var oReservedSlot = element.parkingslot_parkingLotNumber;
+
+                // Read parking slots to update status
+                oModel.read("/ParkingLot", {
+                  filters: [new sap.ui.model.Filter("parkingLotNumber", sap.ui.model.FilterOperator.EQ, oReservedSlot)],
+                  success: function (parkingData) {
+                    if (parkingData.results.length > 0) {
+                      var oParkingData = parkingData.results[0];
+
+                      // Update slot status
+                      oModel.update("/ParkingLot('" + oParkingData.parkingLotNumber + "')", {
+                        status: "Reserved"
+                      }, {
+                        success: function () {
+                          oThis.getView().byId("idSlotsTable").getBinding("items").refresh();
+                          MessageToast.show("Refresh Successful");
+                        },
+                        error: function () {
+                          MessageToast.show("Error while updating slot status");
+                        }
+                      });
+                    }
+                  },
+                  error: function () {
+                    MessageToast.show("Error while fetching parking slots");
+                  }
+                });
+              }
+            });
+          } else {
+            MessageToast.show("No reserved slots found today");
+          }
+        },
+        error: function () {
+          MessageToast.show("Error while fetching reserved slots");
+        }
+      });
+    },
+    // onTransportTypeChange: function (oEvent) {
+    //   console.log("Transport type change event triggered");
+
+    //   // Get the selected item
+    //   var oSelectedItem = oEvent.getParameter("selectedItem");
+
+    //   if (oSelectedItem) {
+    //     var sSelectedTransportType = oSelectedItem.getKey();
+    //     console.log("Selected Transport Type:", sSelectedTransportType);
+
+    //     var oParkingLotSelect = this.byId("parkingLotSelect");
+    //     if (!oParkingLotSelect) {
+    //       console.error("ParkingLot Select ComboBox not found.");
+    //       return;
+    //     }
+
+    //     var oBinding = oParkingLotSelect.getBinding("items");
+    //     if (!oBinding) {
+    //       console.error("Binding for ParkingLot Select not found.");
+    //       return;
+    //     }
+
+    //     // Define filters
+    //     var aFilters = [
+    //       new sap.ui.model.Filter("status", sap.ui.model.FilterOperator.EQ, "Available"),
+    //       new sap.ui.model.Filter("trasnporTtype", sap.ui.model.FilterOperator.EQ, sSelectedTransportType)
+    //     ];
+
+    //     // Apply filters
+    //     oBinding.filter(aFilters);
+    //     console.log("Filters applied to ParkingLot Select ComboBox.");
+    //   } else {
+    //     console.warn("No transport type selected.");
+    //   }
+    // },
+    onTruckTypeSelect: function () {
+      var oView = this.getView();
+      var oOutboundCheckBox = oView.byId("_IDOutboundCheckBox");
+
+      // Default truck type is "Inbound"
+      var sSelectedTruckType = "Inward";
+
+      // If outbound checkbox is selected, update truck type to "Outbound"
+      if (oOutboundCheckBox.getSelected()) {
+        sSelectedTruckType = "Outward";
+      }
+
+      // Apply filters to the parking lot Select control
+      this.sSelectedTruckType = sSelectedTruckType;
+      var aFilters = [
+        new sap.ui.model.Filter("trasnporTtype", sap.ui.model.FilterOperator.EQ, sSelectedTruckType),
+        new sap.ui.model.Filter("status", sap.ui.model.FilterOperator.EQ, "Available")
+      ];
+      var oSelect = oView.byId("parkingLotSelect");
+      var oBinding = oSelect.getBinding("items");
+      oBinding.filter(aFilters);
     },
   });
 });

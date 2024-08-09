@@ -11,28 +11,29 @@
         contentHeight="85%"   
     >
      <customHeader>
-            <Bar id="_IDGenHistoryBar1">
-                 <contentMiddle>
+            <Bar id="_IDGenHistoryBar1" class="title">
+                 <contentMiddle >
                     <FlexBox
                         id="flexboxHistoryHeader"
                         alignItems="Center"
                         justifyContent="Center"
-                        width="100%">
-                        <Text id="IDGenHistoryText1" text="ParkingLot History" textAlign="Center" />
+                        width="100%"
+                        >
+                        <Text id="IDGenHistoryText1" text="ParkingLot History" textAlign="Center"  />
                     </FlexBox>
                 </contentMiddle>
                 <contentRight>
                     <Button
-                            class="button"
+                            class="button1"
                             id="idCloseHistoryBTN"
-                            text="cancel"
+                            icon="sap-icon://sys-cancel"
                             press="onCloseHistoryDialog"
-                            type="Transparent"
+                            type="Reject"
                         />
                 </contentRight>
             </Bar>
         </customHeader>
-        <content>
+        <content >
             <Table
                 id="idHistorySlotsTable"
                 growing="true"

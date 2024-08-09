@@ -56,6 +56,30 @@ modules:
         existing_destinations_policy: ignore
   build-parameters:
     no-source: true
+- name: Parking-Application-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: Parking-Application_html_repo_host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - comappodata.zip
+      name: comappodata
+      target-path: resources/
+- name: comappodata
+  type: html5
+  path: odata
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
 resources:
 - name: Parking-Application-db
   type: com.sap.xs.hdi-container
@@ -76,6 +100,15 @@ resources:
   parameters:
     config:
       HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
       version: 1.0.0
     service: destination
     service-name: Parking-Application-destination-service
@@ -87,6 +120,7 @@ resources:
     service-name: Parking-Application-html5-app-host-service
     service-plan: app-host
 parameters:
+  deploy_mode: html5-repo
   enable-parallel-deployments: true
 build-parameters:
   before-all:

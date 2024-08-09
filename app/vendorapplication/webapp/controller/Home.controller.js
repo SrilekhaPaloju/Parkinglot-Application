@@ -2,8 +2,10 @@ sap.ui.define([
   "./BaseController",
   "sap/ui/core/mvc/Controller",
   "sap/m/MessageToast",
+  "sap/ui/model/Filter",
+  "sap/ui/model/FilterOperator"
 ],
-  function (Controller, MessageToast) {
+  function (Controller, MessageToast,Filter,FilterOperator) {
     "use strict";
 
     return Controller.extend("com.app.vendorapplication.controller.Home", {
@@ -19,10 +21,14 @@ sap.ui.define([
       },
       onReserveDialogOpened: function () {
         var today = new Date();
-        var oDateTimePicker = this.byId("idDtaetimepicker");
+        var maxDate = new Date();
+        maxDate.setDate(today.getDate() + 7); // Set max date to 7 days from today
+      
+        var oDateTimePicker = this.byId("idDatetimepicker");
         if (oDateTimePicker) {
           oDateTimePicker.setMinDate(today);
-          oDateTimePicker.setDisplayFormat("yyyy-MM-dd HH:mm:ss");
+          oDateTimePicker.setMaxDate(maxDate); // Set the max date
+          oDateTimePicker.setDisplayFormat("yyyy-MM-dd");
         }
       },
       onCloseReserveDialog: function () {
@@ -38,7 +44,7 @@ sap.ui.define([
         var sDriverName = this.byId("_IDDriverInput2").getValue();
         var sPhoneNumber = this.byId("_IDPhnnoInput2").getValue();
         var sTransportType = this.byId("idTrasporttype").getSelectedKey();
-        var oDatePicker = oUserView.byId("idDtaetimepicker");
+        var oDatePicker = oUserView.byId("idDatetimepicker");
         var oSelectedDate = oDatePicker.getDateValue();
 
         const reserveModel = new sap.ui.model.json.JSONModel({
@@ -114,7 +120,7 @@ sap.ui.define([
         // Create the reservation entry
         await this.createData(oModel, oPayload, "/Reservations");
 
-        // Update the parking lot status to Reserved
+      //  Update the parking lot status to Reserved
         const updatedParkingLot = {
           status: "Reserved"
         };
@@ -131,7 +137,7 @@ sap.ui.define([
         // Close the dialog and show a success message
         this.oReserveDialog.close();
         sap.m.MessageToast.show("Reserved Successfully");
-        this.updateBadgeValue();
+        this.updateParkingLotSelect();
 
         // Refresh the dropdown for available parking lots
         if (this.byId("parkingLotSelect")) {
@@ -163,5 +169,66 @@ sap.ui.define([
           });
         });
       },
+      onTruckTypeSelect: function (oEvent) {
+        // Get the selected transport type
+        var sSelectedTransportType = oEvent.getSource().getSelectedKey();
+        console.log("Selected Transport Type:", sSelectedTransportType);
+     
+        // Get the reference to the parking lot Select control
+        var oParkingLotSelect = this.getView().byId("parkingLotSelect");
+     
+        // Check if the Select control is found
+        if (!oParkingLotSelect) {
+            console.error("Parking Lot Select control not found!");
+            return;
+        }
+     
+        // Build the filter based on the selected transport type
+        var aFilters = [];
+        if (sSelectedTransportType === "Inward" || sSelectedTransportType === "Outward") {
+            aFilters.push(new sap.ui.model.Filter("status", sap.ui.model.FilterOperator.EQ, "Available"));
+            aFilters.push(new sap.ui.model.Filter("trasnporTtype", sap.ui.model.FilterOperator.EQ, sSelectedTransportType));
+        }
+     
+        // Apply the filter to the parking lot Select control's binding
+        var oBinding = oParkingLotSelect.getBinding("items");
+        if (oBinding) {
+            oBinding.filter(aFilters);
+        } else {
+            console.error("Binding for parking lot Select control not found!");
+        }
+    },
+    updateParkingLotSelect: async function () {
+      var oModel = this.getView().getModel("ModelV2");
+     
+      try {
+          var aInboundSlots = await new Promise((resolve, reject) => {
+              oModel.read("/ParkingLot", {
+                  filters: [
+                      new sap.ui.model.Filter("trasnporTtype", sap.ui.model.FilterOperator.EQ, "Inward"),
+                      new sap.ui.model.Filter("status", sap.ui.model.FilterOperator.EQ, "Available")
+                  ],
+                  success: function (oData) {
+                      resolve(oData.results);
+                  },
+                  error: function (oError) {
+                      reject(oError);
+                  }
+              });
+          });
+         
+          var oParkingLotSelect = this.byId("parkingLotSelect");
+          oParkingLotSelect.destroyItems();
+         
+          aInboundSlots.forEach(slot => {
+              oParkingLotSelect.addItem(new sap.ui.core.Item({
+                  key: slot.parkingLotNumber,
+                  text: slot.parkingLotNumber,
+              }));
+          });
+      } catch (error) {
+          sap.m.MessageBox.error("Failed to update parking lot select: " + error.message);
+      }
+  },
     });
   });

@@ -13,22 +13,6 @@
         title="Slot Allocation"
         class="dialogSlideDown"
     >
-        <!-- <beginButton>
-            <Button
-                id="_IDAssignButton"
-                text="Assign"
-                press="onAssignPress"
-                type="Accept"
-            />
-        </beginButton>
-        <endButton>
-                <Button
-                    id="idCancelslot"
-                    text="Cancel"
-                    press="onCloseCreateDialog"
-                    type="Negative"
-                />
-        </endButton> -->
         <content>
             <form:SimpleForm
                 id="SimpleFormToolbar"
@@ -50,42 +34,9 @@
                 ariaLabelledBy="Title1"
                 width="100%"
             >
-                <Label
-                    id="_IDGenLabel1"
-                    text="Parkinglot Number"
-                />
-                <!-- <Select
-                    id="parkingLotSelect"
-                    selectedKey=""
-                    items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'EQ', value1: 'Available'}]}"
-                >
-                    <core:Item
-                        id="_IDGenItem4"
-                        key="{parkingLotNumber}"
-                        text="{parkingLotNumber}"
-                    />
-                </Select> -->
-                <VBox id="idvboxparkingnumber">
-                    <ComboBox
-                        id="parkingLotSelect"
-                        width="50rem"
-                        selectedKey="{parkingModel>/parkingLotNumber}"
-                        items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'NE', value1: 'Occupied'}]}"
-                    >
-                        <core:Item
-                            id="_IDGenItem3"
-                            key="{parkingLotNumber}"
-                            text="{parkingLotNumber}"
-                        />
-                    </ComboBox>
-                    <Input
-                        id="idparkingLotNumberCol"
-                        value=""
-                        visible="false"
-                    />
-                </VBox>
-
-                <Label
+               
+                             
+            <Label
                     id="_IDGenLabel2"
                     text="Vehicle Number"
                 />
@@ -100,13 +51,14 @@
                         scanSuccess="onScanSuccessOne"
                         scanFail="onScanErrorOne"
                         inputLiveUpdate="onScanLiveUpdate"
-                        dialogTitle=""
+                        dialogTitle="Enter Qrcode value"
                         class="sampleBarcodeScannerButtonWithZebraEB"
                     />
                 </HBox>
                 <Label
                     id="_IDDriverLabel2"
                     text="Driver Name"
+                   
                 />
                 <Input
                     id="_IDDriverInput2"
@@ -115,49 +67,51 @@
                 <Label
                     id="_IDPhnnoLabel2"
                     text="Phone Number"
+                  
                 />
                 <Input
                     id="_IDPhnnoInput2"
                     value=""
                 />
+                   <HBox id="_IDSelectCheckBox">
+                                    <CheckBox
+                                        id="_IDOutboundCheckBox"
+                                        text="Outward"
+                                        class="SlotTypeCheckBox"
+                                        select="onTruckTypeSelect"
+                                    />
+                                               </HBox>
+          
                 <Label
-                    id="_IDGenLabel4"
-                    text="Transport type"
+                    id="_IDGenLabel1"
+                    text="Parkinglot Number"
                 />
-                <!-- <Select
-                    id="country"
-                    selectedKey=""
-                >
-                    <items>
+                <VBox id="idvboxparkingnumber">
+                    <ComboBox
+                        id="parkingLotSelect"
+                        width="30rem"
+                        selectedKey="{parkingModel>/parkingLotNumber}"
+                        items="{path: '/ParkingLot',  filters: [
+                                            {path: 'status', operator: 'EQ', value1: 'Available'},
+                                            {path: 'trasnporTtype', operator: 'EQ', value1: 'Inward'}
+                                        ]
+                                    }"
+                       
+                    >
                         <core:Item
-                            id="_IDGenItem1"
-                            text="Inward"
-                            key="Inward"
+                            id="_IDGenItem3"
+                            key="{parkingLotNumber}"
+                            text="{parkingLotNumber}"
                         />
-                        <core:Item
-                            id="_IDGenItem2"
-                            text="Outward"
-                            key="Outward"
-                        />
-                    </items>
-                </Select> -->
-                <ComboBox
-                    id="country"
-                    selectedKey="{parkingModel>/trasnporTtype}"
-                >
-                    <items>
-                        <core:Item
-                            id="_IDGenItem1"
-                            text="Inward"
-                            key="Inward"
-                        />
-                        <core:Item
-                            id="_IDGenItem2"
-                            text="Outward"
-                            key="Outward"
-                        />
-                    </items>
-                </ComboBox>
+                    </ComboBox>
+                    <Input
+                        id="idparkingLotNumberCol"
+                        value=""
+                        visible="false"
+                    />
+                </VBox>
+        
+                
                  <Input
                     id="idIntime"
                     value=""

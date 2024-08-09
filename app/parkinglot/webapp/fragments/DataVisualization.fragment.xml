@@ -14,7 +14,7 @@
         contentHeight="85%"   
     >
         <customHeader>
-            <Bar id="_IDGenBar1">
+            <Bar id="_IDGenBar1" class="title">
                 <contentMiddle>
                     <FlexBox
                         id="flexboxHeader"

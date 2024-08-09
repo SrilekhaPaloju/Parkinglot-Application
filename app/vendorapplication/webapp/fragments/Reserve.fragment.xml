@@ -55,7 +55,9 @@
                 <Select
                     id="parkingLotSelect"
                     selectedKey=""
-                    items="{path: '/ParkingLot', filters: [{path: 'status', operator: 'EQ', value1: 'Available'}]}"
+                    items="{path: '/ParkingLot', filters: [
+                    {path: 'status', operator: 'EQ', value1: 'Available'},
+                    {path: 'trasnporTtype', operator: 'EQ', value1: 'Inward'}]}"
                 >
                     <core:Item
                         id="_IDGenItem4"
@@ -63,7 +65,7 @@
                         text="{parkingLotNumber}"
                     />
                 </Select>
-              <Label
+                <Label
                     id="_IDGenVendorLabel"
                     text="Vendor Name"
                 />
@@ -102,6 +104,7 @@
                 <Select
                     id="idTrasporttype"
                     selectedKey=""
+                    change="onTruckTypeSelect"
                 >
                     <items>
                         <core:Item
@@ -116,18 +119,27 @@
                         />
                     </items>
                 </Select>
-                	<Label id="iddatetimelabel" text="Date and Time" labelFor="DTP5"/>
-		<DateTimePicker
-			id="idDtaetimepicker"
-			value="{
-				path:'/valueDTP5',
-				type:'sap.ui.model.type.DateTime',
-				formatOptions: {
-					style: 'medium',
-					strictParsing: true
-				}
-			}"
-			class="sapUiSmallMarginBottom"/>
+                <Label
+                    id="iddatetimelabel"
+                    text="Date and Time"
+                    labelFor="DTP5"
+                />
+                <!-- <DateTimePicker
+                    id="idDatetimepicker"
+                    value="{
+        path:'/valueDTP5',
+        type:'sap.ui.model.type.DateTime',
+        formatOptions: {
+            style: 'medium',
+            strictParsing: true
+        }
+    }"
+                    class="sapUiSmallMarginBottom"
+                /> -->
+                	<DatePicker
+					id="idDatetimepicker"
+					change="handleChange"
+					class="sapUiSmallMarginBottom"/>
             </form:SimpleForm>
         </content>
     </Dialog>
